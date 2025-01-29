@@ -5,6 +5,7 @@ import Head from "next/head";
 import Header from "./components/Header";
 import { Typewriter } from "react-simple-typewriter";
 import Image from "next/image"; 
+import Testimonials from "./components/Testimonials";
 
 export default function Home() {
   return (
@@ -44,9 +45,9 @@ export default function Home() {
 
           </div>
         </section>
-        {/* shop section */}
+
         <section className="bg-[#6850F5] text-white py-12">
-  <div className="container mx-auto px-4 flex flex-col md:flex-row">
+  <div className="container mx-auto px-4 flex flex-col md:flex-row gap-6">
     {/* Sidebar */}
     <aside className="w-full md:w-1/4 bg-[#4D37C3] p-6 rounded-lg text-left">
       <h2 className="text-lg font-bold text-black bg-lime-400 p-2 rounded-md">SHOP BY</h2>
@@ -80,39 +81,59 @@ export default function Home() {
       </div>
     </aside>
 
-{/* Product Grid */}
-<div className="w-full md:w-3/4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
-  {[
-    { name: "Spring Mattress", price: "₦75,000.00", img: "/images/mattress.png" },
-    { name: "Table", price: "₦45,700.00", img: "/images/table.png" },
-    { name: "Gas cooker", price: "₦110,000.00", img: "/images/gas.png" },
-    { name: "Laptop Internal SSD", price: "₦35,000.00", img: "/images/harddisk.png" },
-    { name: "Laptop", price: "₦15,432.00", img: "/images/laptop.png" },
-    { name: "Hair Clipper", price: "₦2600.00", img: "/images/clipper.png" },
-    { name: "Office Chair", price: "₦211600.00", img: "/images/chair.png" },
-    { name: "Desktop Fan", price: "₦2600.00", img: "/images/fan.png" },
-    { name: "Flash Drive", price: "₦2600.00", img: "/images/flashdrive.png" },
+    {/* Main Content */}
+    <div className="w-full md:w-3/4 bg-white p-6 rounded-lg shadow-md flex-1">
+      {/* Search Bar */}
+      <div className="flex justify-end mb-6">
+        <input 
+          type="text" 
+          placeholder="Search items and accommodation" 
+          className="w-full md:w-1/2 p-2 rounded-full text-black border border-gray-300" 
+        />
+      </div>
 
-  ].map((item, index) => (
-    <div key={index} className="bg-white text-black px-10 py-10 rounded-lg shadow-md relative">
-      <Image 
-        src={item.img} 
-        alt={item.name} 
-        width={200} 
-        height={200} 
-        className="w-full h-40 object-contain rounded-md" 
-      />
-      <h3 className="mt-2 font-semibold">{item.name}</h3>
-      <p className="text-gray-600">{item.price}</p>
-      <button className="absolute top-2 right-2 bg-lime-400 text-black px-3 py-1 text-sm rounded-lg">
-        SHOP NOW
-      </button>
+      {/* Product Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {[
+          { name: "Spring Mattress", price: "₦75,000.00", img: "/images/mattress.png" },
+          { name: "Table", price: "₦45,700.00", img: "/images/table.png" },
+          { name: "Gas cooker", price: "₦110,000.00", img: "/images/gas.png" },
+          { name: "Laptop Internal SSD", price: "₦35,000.00", img: "/images/harddisk.png" },
+          { name: "Laptop", price: "₦15,432.00", img: "/images/laptop.png" },
+          { name: "Hair Clipper", price: "₦26,564.00", img: "/images/clipper.png" },
+          { name: "Office Chair", price: "₦211,600.00", img: "/images/chair.png" },
+          { name: "Desktop Fan", price: "₦26,000.00", img: "/images/fan.png" },
+          { name: "Flash Drive", price: "₦2,600.00", img: "/images/flashdrive.png" },
+        ].map((item, index) => (
+          <div key={index} className="bg-white text-black px-6 py-6 rounded-lg shadow-md relative">
+            <Image 
+              src={item.img} 
+              alt={item.name} 
+              width={200} 
+              height={200} 
+              className="w-full h-40 object-contain rounded-md" 
+            />
+            <h3 className="mt-2 font-semibold">{item.name}</h3>
+            <p className="text-gray-600">{item.price}</p>
+            <button className="absolute top-2 right-2 bg-lime-400 text-black px-5 py-2 text-sm rounded-full">
+              SHOP NOW
+            </button>
+          </div>
+        ))}
+      </div>
+
+      {/* See More Button */}
+      <div className="flex justify-end mt-6">
+        <button className="text-lime-400 text-lg font-bold flex items-center">
+          See more <span className="ml-2">➡</span>
+        </button>
+      </div>
     </div>
-  ))}
-</div>
-
   </div>
 </section>
+{/* Testimonials section */}
+<Testimonials />
+
 
 
       </main>
