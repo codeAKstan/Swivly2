@@ -3,7 +3,9 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Menu, X, Home, Store, Building2, Mail } from "lucide-react"; // Import icons
+import { 
+  Menu, X, Home, Store, Building2, Mail, LogIn, UserPlus 
+} from "lucide-react"; // Import icons
 
 const Header: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -17,72 +19,77 @@ const Header: React.FC = () => {
 
       {/* Desktop Navigation */}
       <nav className="hidden md:flex space-x-6">
-        <Link href="/" className="hover:underline flex items-center space-x-2">
-          <Home size={20} />
+        <Link href="/" className="flex items-center space-x-2 hover:underline">
+          <Home size={18} />
           <span>Home</span>
         </Link>
-        <Link href="/marketplace" className="hover:underline flex items-center space-x-2">
-          <Store size={20} />
+        <Link href="/marketplace" className="flex items-center space-x-2 hover:underline">
+          <Store size={18} />
           <span>Market Place</span>
         </Link>
-        <Link href="/accommodation" className="hover:underline flex items-center space-x-2">
-          <Building2 size={20} />
+        <Link href="/accommodation" className="flex items-center space-x-2 hover:underline">
+          <Building2 size={18} />
           <span>Accommodation</span>
         </Link>
-        <Link href="/contact" className="hover:underline flex items-center space-x-2">
-          <Mail size={20} />
+        <Link href="/contact" className="flex items-center space-x-2 hover:underline">
+          <Mail size={18} />
           <span>Contact Us</span>
         </Link>
       </nav>
 
-      {/* Auth Buttons */}
+      {/* Auth Buttons (Desktop) */}
       <div className="hidden md:flex space-x-4">
-        <button className="bg-white text-blue-500 py-2 px-6 rounded-full">Log In</button>
-        <button className="bg-lime-400 text-black py-2 px-6 rounded-full">Sign Up</button>
+        <button className="flex items-center space-x-2 bg-white text-blue-500 py-2 px-6 rounded-full">
+          <LogIn size={18} />
+          <span>Log In</span>
+        </button>
+        <button className="flex items-center space-x-2 bg-lime-400 text-black py-2 px-6 rounded-full">
+          <UserPlus size={18} />
+          <span>Sign Up</span>
+        </button>
       </div>
 
       {/* Mobile Menu Button */}
-      {!isOpen && (
-        <button className="md:hidden text-white" onClick={() => setIsOpen(true)}>
-          <Menu size={28} />
-        </button>
-      )}
+      <button className="md:hidden text-white" onClick={() => setIsOpen(!isOpen)}>
+        {isOpen ? <X size={28} /> : <Menu size={28} />}
+      </button>
 
       {/* Mobile Sidebar Navigation */}
-      {isOpen && (
-        <div className="fixed top-0 left-0 w-64 h-full bg-black text-white z-50 transform transition-transform duration-300 ease-in-out md:hidden shadow-lg">
-          {/* Close Button */}
-          <button className="absolute top-4 right-4 text-white" onClick={() => setIsOpen(false)}>
-            <X size={28} />
+      <div className={`fixed top-0 left-0 w-64 h-full bg-black text-white z-50 transform ${isOpen ? "translate-x-0" : "-translate-x-full"} transition-transform duration-300 ease-in-out md:hidden`}>
+        <button className="absolute top-4 right-4 text-white" onClick={() => setIsOpen(false)}>
+          <X size={28} />
+        </button>
+
+        <nav className="flex flex-col space-y-6 mt-16 px-6">
+          <Link href="/" className="flex items-center space-x-2 hover:underline" onClick={() => setIsOpen(false)}>
+            <Home size={18} />
+            <span>Home</span>
+          </Link>
+          <Link href="/marketplace" className="flex items-center space-x-2 hover:underline" onClick={() => setIsOpen(false)}>
+            <Store size={18} />
+            <span>Market Place</span>
+          </Link>
+          <Link href="/accommodation" className="flex items-center space-x-2 hover:underline" onClick={() => setIsOpen(false)}>
+            <Building2 size={18} />
+            <span>Accommodation</span>
+          </Link>
+          <Link href="/contact" className="flex items-center space-x-2 hover:underline" onClick={() => setIsOpen(false)}>
+            <Mail size={18} />
+            <span>Contact Us</span>
+          </Link>
+        </nav>
+
+        <div className="mt-6 px-6">
+          <button className="flex items-center justify-center space-x-2 bg-white text-blue-500 py-2 px-6 rounded-full w-full" onClick={() => setIsOpen(false)}>
+            <LogIn size={18} />
+            <span>Log In</span>
           </button>
-
-          {/* Sidebar Nav */}
-          <nav className="flex flex-col space-y-6 mt-16 px-6">
-            <Link href="/" className="hover:underline flex items-center space-x-2" onClick={() => setIsOpen(false)}>
-              <Home size={20} />
-              <span>Home</span>
-            </Link>
-            <Link href="/marketplace" className="hover:underline flex items-center space-x-2" onClick={() => setIsOpen(false)}>
-              <Store size={20} />
-              <span>Market Place</span>
-            </Link>
-            <Link href="/accommodation" className="hover:underline flex items-center space-x-2" onClick={() => setIsOpen(false)}>
-              <Building2 size={20} />
-              <span>Accommodation</span>
-            </Link>
-            <Link href="/contact" className="hover:underline flex items-center space-x-2" onClick={() => setIsOpen(false)}>
-              <Mail size={20} />
-              <span>Contact Us</span>
-            </Link>
-          </nav>
-
-          {/* Sidebar Auth Buttons */}
-          <div className="mt-6 px-6">
-            <button className="bg-white text-blue-500 py-2 px-6 rounded-full w-full" onClick={() => setIsOpen(false)}>Log In</button>
-            <button className="bg-lime-400 text-black py-2 px-6 rounded-full w-full mt-4" onClick={() => setIsOpen(false)}>Sign Up</button>
-          </div>
+          <button className="flex items-center justify-center space-x-2 bg-lime-400 text-black py-2 px-6 rounded-full w-full mt-4" onClick={() => setIsOpen(false)}>
+            <UserPlus size={18} />
+            <span>Sign Up</span>
+          </button>
         </div>
-      )}
+      </div>
     </header>
   );
 };
