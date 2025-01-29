@@ -6,6 +6,7 @@ import Header from "./components/Header";
 import { Typewriter } from "react-simple-typewriter";
 import Image from "next/image"; 
 import Testimonials from "./components/Testimonials";
+import FAQSection from "./components/Faqs"
 
 export default function Home() {
   return (
@@ -133,6 +134,7 @@ export default function Home() {
 </section>
 {/* Testimonials section */}
 <Testimonials />
+<FAQSection />
 
 
 
