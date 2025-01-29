@@ -49,13 +49,16 @@ const Header: React.FC = () => {
         </button>
       </div>
 
-      {/* Mobile Menu Button */}
-      <button className="md:hidden text-white" onClick={() => setIsOpen(!isOpen)}>
-        {isOpen ? <X size={28} /> : <Menu size={28} />}
-      </button>
+      {/* Mobile Menu Button (Only Show Menu Icon) */}
+      {!isOpen && (
+        <button className="md:hidden text-white" onClick={() => setIsOpen(true)}>
+          <Menu size={28} />
+        </button>
+      )}
 
       {/* Mobile Sidebar Navigation */}
       <div className={`fixed top-0 left-0 w-64 h-full bg-black text-white z-50 transform ${isOpen ? "translate-x-0" : "-translate-x-full"} transition-transform duration-300 ease-in-out md:hidden`}>
+        {/* Close Button (Only Inside Sidebar) */}
         <button className="absolute top-4 right-4 text-white" onClick={() => setIsOpen(false)}>
           <X size={28} />
         </button>
