@@ -39,14 +39,14 @@ const Header: React.FC = () => {
 
       {/* Auth Buttons (Desktop) */}
       <div className="hidden md:flex space-x-4">
-        <button className="flex items-center space-x-2 bg-white text-blue-500 py-2 px-6 rounded-full">
+        <Link href="/login" className="flex items-center space-x-2 bg-white text-blue-500 py-2 px-6 rounded-full">
           <LogIn size={18} />
           <span>Log In</span>
-        </button>
-        <button className="flex items-center space-x-2 bg-lime-400 text-black py-2 px-6 rounded-full">
+        </Link>
+        <Link href="/register" className="flex items-center space-x-2 bg-lime-400 text-black py-2 px-6 rounded-full">
           <UserPlus size={18} />
           <span>Sign Up</span>
-        </button>
+        </Link>
       </div>
 
       {/* Mobile Menu Button (Only Show Menu Icon) */}
@@ -83,14 +83,14 @@ const Header: React.FC = () => {
         </nav>
 
         <div className="mt-6 px-6">
-          <button className="flex items-center justify-center space-x-2 bg-white text-blue-500 py-2 px-6 rounded-full w-full" onClick={() => setIsOpen(false)}>
+          <Link href="/login" className="flex items-center justify-center space-x-2 bg-white text-blue-500 py-2 px-6 rounded-full w-full" onClick={() => setIsOpen(false)}>
             <LogIn size={18} />
             <span>Log In</span>
-          </button>
-          <button className="flex items-center justify-center space-x-2 bg-lime-400 text-black py-2 px-6 rounded-full w-full mt-4" onClick={() => setIsOpen(false)}>
+          </Link>
+          <Link href="/register" className="flex items-center justify-center space-x-2 bg-lime-400 text-black py-2 px-6 rounded-full w-full mt-4" onClick={() => setIsOpen(false)}>
             <UserPlus size={18} />
             <span>Sign Up</span>
-          </button>
+          </Link>
         </div>
       </div>
     </header>
