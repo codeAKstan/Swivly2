@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { login } from "../../services/auth"; 
 import Header from "../components/Header";
 import Link from "next/link";
+import { ClipLoader } from "react-spinners";
 
 const LoginPage = () => {
   const router = useRouter();
@@ -13,6 +14,7 @@ const LoginPage = () => {
     password: "",
   });
   const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false); // Add loading state
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -25,6 +27,7 @@ const LoginPage = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    setIsLoading(true); // Start loading
 
     try {
       const response = await login(formData);
@@ -34,6 +37,8 @@ const LoginPage = () => {
       router.push("/dashboard");
     } catch (err: any) {
       setError(err.message || "Login failed. Please check your credentials.");
+    } finally {
+      setIsLoading(false); // Stop loading
     }
   };
 
@@ -76,9 +81,14 @@ const LoginPage = () => {
           </div>
           <button
             type="submit"
-            className="w-full bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+            className="w-full bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 flex items-center justify-center"
+            disabled={isLoading} // Disable button while loading
           >
-            Log In
+            {isLoading ? (
+              <ClipLoader color="#ffffff" size={20} /> // Show spinner while loading
+            ) : (
+              "Log In"
+            )}
           </button>
         </form>
         <p className="mt-4 text-center text-sm text-gray-600">

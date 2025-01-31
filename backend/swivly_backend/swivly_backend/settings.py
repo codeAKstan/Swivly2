@@ -93,7 +93,7 @@ WSGI_APPLICATION = 'swivly_backend.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'swivly2.0_db',
+        'NAME': 'swiv-2.0',
         'USER': 'postgres',
         'PASSWORD': '554433',
         'PORT': '5432',
