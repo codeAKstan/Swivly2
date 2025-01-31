@@ -27,18 +27,25 @@ class RegisterUserView(generics.CreateAPIView):
                 "access": str(refresh.access_token),
             }, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
 
 class LoginView(APIView):
     def post(self, request):
         email = request.data.get("email")
         password = request.data.get("password")
 
+        print(f"Attempting to log in with email: {email}")  # Debugging
+
+        # Authenticate the user
         user = authenticate(request, username=email, password=password)
+        
         if user:
+            print(f"User authenticated: {user}")  # Debugging
+            # Generate JWT tokens
             refresh = RefreshToken.for_user(user)
             return Response({
                 "refresh": str(refresh),
                 "access": str(refresh.access_token),
             }, status=status.HTTP_200_OK)
-        return Response({"message": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
+        else:
+            print("Authentication failed")  # Debugging
+            return Response({"message": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)

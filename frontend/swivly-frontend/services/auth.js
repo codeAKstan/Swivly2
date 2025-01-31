@@ -1,21 +1,46 @@
-import api from '../utils/api';
+// import api from '../utils/api';
 
 export const register = async (userData) => {
-  try {
-    const response = await api.post('/register/', userData);
-    return response.data;
-  } catch (error) {
-    throw new Error(error.response?.data?.message || 'Registration failed');
-  }
-};
-
-export const login = async (credentials) => {
     try {
-      const response = await api.post("/api/login/", credentials);
-      const { access } = response.data; // Assuming the token is in the response
-      localStorage.setItem("token", access); // Store the token
-      return response.data;
+      const response = await fetch("http://localhost:8000/api/register/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(userData),
+      });
+  
+      if (!response.ok) {
+        throw new Error("Registration failed");
+      }
+  
+      const data = await response.json();
+      return data;
     } catch (error) {
-      throw new Error(error.response?.data?.message || "Login failed");
+      throw new Error(error.message || "Registration failed");
+    }
+  };
+
+  export const login = async (credentials) => {
+    try {
+      console.log("Sending login request with credentials:", credentials); // Debugging
+      const response = await fetch("http://localhost:8000/api/login/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(credentials),
+      });
+  
+      if (!response.ok) {
+        throw new Error("Login failed");
+      }
+  
+      const data = await response.json();
+      localStorage.setItem("token", data.access); // Store the access token
+      return data;
+    } catch (error) {
+      console.error("Login error:", error); // Debugging
+      throw new Error(error.message || "Login failed");
     }
   };
