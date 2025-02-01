@@ -7,6 +7,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework_simplejwt.tokens import RefreshToken
 from .serializers import UserSerializer
 from django.contrib.auth import authenticate
+from rest_framework.permissions import IsAuthenticated
 
 # Use get_user_model() to reference the custom user model
 User = get_user_model()
@@ -49,3 +50,18 @@ class LoginView(APIView):
         else:
             print("Authentication failed")  # Debugging
             return Response({"message": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
+        
+
+
+
+
+class UserView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        return Response({
+            "name": user.username,
+            "email": user.email,
+            "role": user.role,
+        })
