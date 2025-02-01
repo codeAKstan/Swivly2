@@ -64,4 +64,5 @@ class UserView(APIView):
             "name": user.username,
             "email": user.email,
             "role": user.role,
+            "profilePicture": user.profile.picture.url if hasattr(user, 'profile') else "/images/default-profile.png",
         })
