@@ -52,9 +52,9 @@ const Header: React.FC = () => {
               <ShoppingCart size={18} />
               <span>Cart</span>
             </Link>
-            <button onClick={logout} className="flex items-center space-x-2 bg-red-500 text-white py-2 px-6 rounded-full">
+            {/* <button onClick={logout} className="flex items-center space-x-2 bg-red-500 text-white py-2 px-6 rounded-full">
               <span>Logout</span>
-            </button>
+            </button> */}
           </>
         ) : (
           <>
