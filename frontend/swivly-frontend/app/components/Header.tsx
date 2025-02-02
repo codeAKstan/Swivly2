@@ -1,14 +1,17 @@
+// components/Header.tsx
 "use client";
 
 import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { 
-  Menu, X, Home, Store, Building2, Mail, LogIn, UserPlus 
+  Menu, X, Home, Store, Building2, Mail, LogIn, UserPlus, ShoppingCart, LayoutDashboard 
 } from "lucide-react"; // Import icons
+import { useAuth } from "../context/AuthContext";
 
 const Header: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const { isAuthenticated, logout } = useAuth(); // This will trigger re-render when isAuthenticated changes
 
   return (
     <header className="bg-black text-white py-4 px-6 flex justify-between items-center relative z-50">
@@ -39,14 +42,32 @@ const Header: React.FC = () => {
 
       {/* Auth Buttons (Desktop) */}
       <div className="hidden md:flex space-x-4">
-        <Link href="/login" className="flex items-center space-x-2 bg-white text-blue-500 py-2 px-6 rounded-full">
-          <LogIn size={18} />
-          <span>Log In</span>
-        </Link>
-        <Link href="/register" className="flex items-center space-x-2 bg-lime-400 text-black py-2 px-6 rounded-full">
-          <UserPlus size={18} />
-          <span>Sign Up</span>
-        </Link>
+        {isAuthenticated ? (
+          <>
+            <Link href="/dashboard" className="flex items-center space-x-2 bg-white text-blue-500 py-2 px-6 rounded-full">
+              <LayoutDashboard size={18} />
+              <span>Dashboard</span>
+            </Link>
+            <Link href="/cart" className="flex items-center space-x-2 bg-lime-400 text-black py-2 px-6 rounded-full">
+              <ShoppingCart size={18} />
+              <span>Cart</span>
+            </Link>
+            <button onClick={logout} className="flex items-center space-x-2 bg-red-500 text-white py-2 px-6 rounded-full">
+              <span>Logout</span>
+            </button>
+          </>
+        ) : (
+          <>
+            <Link href="/login" className="flex items-center space-x-2 bg-white text-blue-500 py-2 px-6 rounded-full">
+              <LogIn size={18} />
+              <span>Log In</span>
+            </Link>
+            <Link href="/register" className="flex items-center space-x-2 bg-lime-400 text-black py-2 px-6 rounded-full">
+              <UserPlus size={18} />
+              <span>Sign Up</span>
+            </Link>
+          </>
+        )}
       </div>
 
       {/* Mobile Menu Button (Only Show Menu Icon) */}
@@ -83,14 +104,32 @@ const Header: React.FC = () => {
         </nav>
 
         <div className="mt-6 px-6">
-          <Link href="/login" className="flex items-center justify-center space-x-2 bg-white text-blue-500 py-2 px-6 rounded-full w-full" onClick={() => setIsOpen(false)}>
-            <LogIn size={18} />
-            <span>Log In</span>
-          </Link>
-          <Link href="/register" className="flex items-center justify-center space-x-2 bg-lime-400 text-black py-2 px-6 rounded-full w-full mt-4" onClick={() => setIsOpen(false)}>
-            <UserPlus size={18} />
-            <span>Sign Up</span>
-          </Link>
+          {isAuthenticated ? (
+            <>
+              <Link href="/dashboard" className="flex items-center justify-center space-x-2 bg-white text-blue-500 py-2 px-6 rounded-full w-full" onClick={() => setIsOpen(false)}>
+                <LayoutDashboard size={18} />
+                <span>Dashboard</span>
+              </Link>
+              <Link href="/cart" className="flex items-center justify-center space-x-2 bg-lime-400 text-black py-2 px-6 rounded-full w-full mt-4" onClick={() => setIsOpen(false)}>
+                <ShoppingCart size={18} />
+                <span>Cart</span>
+              </Link>
+              <button onClick={logout} className="flex items-center justify-center space-x-2 bg-red-500 text-white py-2 px-6 rounded-full w-full mt-4">
+                <span>Logout</span>
+              </button>
+            </>
+          ) : (
+            <>
+              <Link href="/login" className="flex items-center justify-center space-x-2 bg-white text-blue-500 py-2 px-6 rounded-full w-full" onClick={() => setIsOpen(false)}>
+                <LogIn size={18} />
+                <span>Log In</span>
+              </Link>
+              <Link href="/register" className="flex items-center justify-center space-x-2 bg-lime-400 text-black py-2 px-6 rounded-full w-full mt-4" onClick={() => setIsOpen(false)}>
+                <UserPlus size={18} />
+                <span>Sign Up</span>
+              </Link>
+            </>
+          )}
         </div>
       </div>
     </header>

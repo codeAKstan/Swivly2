@@ -4,7 +4,7 @@ from .models import CustomUser
 
 @admin.register(CustomUser)
 class CustomUserAdmin(UserAdmin):
-    list_display = ('username', 'email', 'role', 'is_staff', 'is_active')
+    list_display = ('username', 'email', 'role', 'address', 'is_staff', 'is_active')
     
     # Fields to filter by in the right sidebar
     list_filter = ('role', 'is_staff', 'is_active')

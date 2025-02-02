@@ -1,62 +1,64 @@
+// app/dashboard/page.tsx
 "use client";
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Header from "../components/Header";
 import Link from "next/link";
-import Image from "next/image";
+import { useAuth } from "../context/AuthContext";
 
 const DashboardPage = () => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [showAddressModal, setShowAddressModal] = useState(false);
     const router = useRouter();
+    const { logout } = useAuth();
 
     useEffect(() => {
         const fetchUserData = async () => {
-            try {
-                const token = localStorage.getItem("token");
-
-                if (!token) {
-                    router.push("/login");
-                    return;
-                }
-
-                const response = await fetch("http://localhost:8000/api/user/", {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                });
-
-                if (!response.ok) {
-                    throw new Error("Failed to fetch user data");
-                }
-
-                const data = await response.json();
-                setUser(data);
-            } catch (error) {
-                console.error("Error fetching user data:", error);
-                router.push("/login");
-            } finally {
-                setLoading(false);
+          try {
+            const token = localStorage.getItem("token");
+      
+            if (!token) {
+              router.push("/login");
+              return;
             }
+      
+            const response = await fetch("http://localhost:8000/api/user/", {
+              headers: {
+                Authorization: `Bearer ${token}`, // Ensure the token is included
+              },
+            });
+      
+            if (!response.ok) {
+              throw new Error("Failed to fetch user data");
+            }
+      
+            const data = await response.json();
+            setUser(data);
+          } catch (error) {
+            console.error("Error fetching user data:", error);
+            router.push("/login");
+          } finally {
+            setLoading(false);
+          }
         };
-
+      
         fetchUserData();
-    }, [router]);
+      }, [router]);
 
     if (loading) {
         return <p>Loading...</p>;
     }
 
     if (!user) {
-        return null; // Prevent rendering the page if the user is redirected
+        return null;
     }
 
     return (
         <div>
             <Header />
             <div className="max-w-4xl mx-auto mt-10 p-6 bg-white rounded-lg shadow-md">
-                {/* Profile Picture and Welcome Message */}
                 <div className="flex items-center space-x-4 mb-6">
                     <div className="w-16 h-16 rounded-full overflow-hidden">
                         <img
@@ -71,7 +73,6 @@ const DashboardPage = () => {
                     </div>
                 </div>
 
-                {/* Profile Section */}
                 <div className="mb-8">
                     <h2 className="text-xl font-semibold mb-4">Profile</h2>
                     <div className="space-y-2">
@@ -98,14 +99,24 @@ const DashboardPage = () => {
                     </div>
                 </div>
 
-                {/* Navigation Links */}
                 <div className="space-y-4">
-                    <Link
-                        href="/address-book"
-                        className="block bg-gray-100 p-4 rounded-lg hover:bg-gray-200"
-                    >
-                        Address Book
-                    </Link>
+                    <div>
+                        <button
+                            onClick={() => setShowAddressModal(!showAddressModal)}
+                            className="block w-full text-left bg-gray-100 p-4 rounded-lg hover:bg-gray-200"
+                        >
+                            Address Book
+                        </button>
+                        {showAddressModal && (
+                            <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+                                <h3 className="font-semibold mb-2">Your default shipping address:</h3>
+                                <p>{user.name}</p>
+                                <p>{user.address || "Null"}</p>
+                                <p>{user.phone_number || "Null"}</p>
+                            </div>
+                        )}
+                    </div>
+
                     <Link
                         href="/purchase-history"
                         className="block bg-gray-100 p-4 rounded-lg hover:bg-gray-200"
@@ -114,7 +125,7 @@ const DashboardPage = () => {
                     </Link>
                     <button
                         onClick={() => {
-                            localStorage.removeItem("token");
+                            logout();
                             router.push("/login");
                         }}
                         className="block w-full text-left bg-red-100 p-4 rounded-lg hover:bg-red-200 text-red-600"

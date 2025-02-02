@@ -1,4 +1,5 @@
-"use client"; // Ensure this is a client-side component
+// app/login/page.tsx
+"use client";
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -6,15 +7,17 @@ import { login } from "../../services/auth";
 import Header from "../components/Header";
 import Link from "next/link";
 import { ClipLoader } from "react-spinners";
+import { useAuth } from "../context/AuthContext";
 
 const LoginPage = () => {
   const router = useRouter();
+  const { login: authLogin } = useAuth();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
   const [error, setError] = useState("");
-  const [isLoading, setIsLoading] = useState(false); // Add loading state
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -27,26 +30,29 @@ const LoginPage = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-    setIsLoading(true); // Start loading
-
+    setIsLoading(true);
+  
     try {
       const response = await login(formData);
       console.log("Login successful:", response);
+  
+      // Save the access token to localStorage
+      localStorage.setItem("token", response.access); 
 
-      // Redirect to the dashboard or home page after successful login
+      authLogin(response.access);
+  
+      // Redirect to the dashboard
       router.push("/dashboard");
     } catch (err: any) {
       setError(err.message || "Login failed. Please check your credentials.");
     } finally {
-      setIsLoading(false); // Stop loading
+      setIsLoading(false);
     }
   };
 
   return (
     <div>
-      {/* Include the Header component */}
       <Header />
-
       <div className="max-w-md mx-auto mt-10 p-6 bg-white rounded-lg shadow-md">
         <h1 className="text-2xl font-bold mb-6 text-center">Login</h1>
         {error && <p className="text-red-500 text-center mb-4">{error}</p>}
@@ -82,10 +88,10 @@ const LoginPage = () => {
           <button
             type="submit"
             className="w-full bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 flex items-center justify-center"
-            disabled={isLoading} // Disable button while loading
+            disabled={isLoading}
           >
             {isLoading ? (
-              <ClipLoader color="#ffffff" size={20} /> // Show spinner while loading
+              <ClipLoader color="#ffffff" size={20} />
             ) : (
               "Log In"
             )}

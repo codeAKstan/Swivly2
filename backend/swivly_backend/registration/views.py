@@ -10,6 +10,8 @@ from django.contrib.auth import authenticate
 from rest_framework.permissions import IsAuthenticated
 from .models import Profile
 from django.conf import settings
+from rest_framework.authentication import TokenAuthentication
+from rest_framework_simplejwt.authentication import JWTAuthentication 
 
 # Use get_user_model() to reference the custom user model
 User = get_user_model()
@@ -57,8 +59,8 @@ class LoginView(APIView):
 
 
 
-
 class UserView(APIView):
+    authentication_classes = [JWTAuthentication]  # Use JWTAuthentication
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
@@ -72,9 +74,10 @@ class UserView(APIView):
             "name": user.username,
             "email": user.email,
             "role": user.role,
+            "address": user.address,
+            "phone_number": user.phone_number or "Null",
             "profilePicture": profile_picture_url or "/images/default-profile.png",
         })
-
 class UpdateProfileView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -109,6 +112,6 @@ class UpdateProfileView(APIView):
             "email": user.email,
             "role": user.role,
             "address": user.address,
-            "phoneNumber": user.phone_number,
+            "phoneNumber": user.phone_number or "Null",
             "profilePicture": profile_picture_url or "/images/default-profile.png",
         }, status=status.HTTP_200_OK)
