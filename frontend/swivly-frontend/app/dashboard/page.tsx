@@ -65,6 +65,7 @@ const DashboardPage = () => {
               width={64}
               height={64}
               className="object-cover"
+              unoptimized={true} // Disable Next.js image optimization for external URLs
             />
           </div>
           <div>

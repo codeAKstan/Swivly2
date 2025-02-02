@@ -8,6 +8,8 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from .serializers import UserSerializer
 from django.contrib.auth import authenticate
 from rest_framework.permissions import IsAuthenticated
+from .models import Profile
+from django.conf import settings
 
 # Use get_user_model() to reference the custom user model
 User = get_user_model()
@@ -60,9 +62,54 @@ class UserView(APIView):
 
     def get(self, request):
         user = request.user
+        profile_picture_url = user.profile.picture_url if hasattr(user, 'profile') else "/images/default-profile.png"
+
         return Response({
             "name": user.username,
             "email": user.email,
             "role": user.role,
-            "profilePicture": user.profile.picture.url if hasattr(user, 'profile') else "/images/default-profile.png",
+            "profilePicture": profile_picture_url,
         })
+    
+
+from django.conf import settings
+
+class UpdateProfileView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def put(self, request):
+        user = request.user
+        data = request.data
+        files = request.FILES
+
+        # Update user fields
+        user.username = data.get("name", user.username)
+        user.email = data.get("email", user.email)
+        user.role = data.get("role", user.role)
+        user.address = data.get("address", user.address)
+        user.phone_number = data.get("phoneNumber", user.phone_number)
+
+        # Ensure the user has a profile
+        if not hasattr(user, 'profile'):
+            Profile.objects.create(user=user)
+
+        # Update profile picture if provided
+        if "profilePicture" in files:
+            user.profile.picture = files["profilePicture"]
+            user.profile.save()
+
+        user.save()
+
+        # Construct the full URL for the profile picture
+        profile_picture_url = user.profile.picture.url if user.profile.picture else None
+        if profile_picture_url:
+            profile_picture_url = request.build_absolute_uri(profile_picture_url)
+
+        return Response({
+            "name": user.username,
+            "email": user.email,
+            "role": user.role,
+            "address": user.address,
+            "phoneNumber": user.phone_number,
+            "profilePicture": profile_picture_url or "/images/default-profile.png",
+        }, status=status.HTTP_200_OK)
