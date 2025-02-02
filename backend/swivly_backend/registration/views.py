@@ -57,22 +57,23 @@ class LoginView(APIView):
 
 
 
+
 class UserView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
         user = request.user
-        profile_picture_url = user.profile.picture_url if hasattr(user, 'profile') else "/images/default-profile.png"
+        profile_picture_url = None
+
+        if hasattr(user, 'profile') and user.profile.picture:
+            profile_picture_url = request.build_absolute_uri(user.profile.picture.url)
 
         return Response({
             "name": user.username,
             "email": user.email,
             "role": user.role,
-            "profilePicture": profile_picture_url,
+            "profilePicture": profile_picture_url or "/images/default-profile.png",
         })
-    
-
-from django.conf import settings
 
 class UpdateProfileView(APIView):
     permission_classes = [IsAuthenticated]
@@ -101,9 +102,7 @@ class UpdateProfileView(APIView):
         user.save()
 
         # Construct the full URL for the profile picture
-        profile_picture_url = user.profile.picture.url if user.profile.picture else None
-        if profile_picture_url:
-            profile_picture_url = request.build_absolute_uri(profile_picture_url)
+        profile_picture_url = request.build_absolute_uri(user.profile.picture.url) if user.profile.picture else None
 
         return Response({
             "name": user.username,
