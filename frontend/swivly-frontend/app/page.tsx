@@ -13,6 +13,7 @@ import { motion } from "framer-motion";
 export default function Home() {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -52,6 +53,11 @@ export default function Home() {
   if (error) {
     return <p>Error: {error}</p>;
   }
+
+  // Filter products based on selected category
+  const filteredProducts = selectedCategory
+    ? products.filter((product) => product.category === selectedCategory)
+    : products;
 
   return (
     <>
@@ -101,12 +107,24 @@ export default function Home() {
                 <h3 className="font-semibold text-lg">Categories</h3>
                 <div className="mt-2">
                   <label className="flex items-center space-x-2">
-                    <input type="radio" name="category" defaultChecked className="accent-lime-400" />
+                    <input
+                      type="radio"
+                      name="category"
+                      checked={selectedCategory === null}
+                      onChange={() => setSelectedCategory(null)}
+                      className="accent-lime-400"
+                    />
                     <span>All</span>
                   </label>
                   {categories.map((category) => (
                     <label key={category.id} className="flex items-center space-x-2">
-                      <input type="radio" name="category" className="accent-lime-400" />
+                      <input
+                        type="radio"
+                        name="category"
+                        checked={selectedCategory === category.name}
+                        onChange={() => setSelectedCategory(category.name)}
+                        className="accent-lime-400"
+                      />
                       <span>{category.name}</span>
                     </label>
                   ))}
@@ -137,39 +155,45 @@ export default function Home() {
 
               {/* Product Grid */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {products.map((product, index) => (
-                  <motion.div
-                    key={product.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: index * 0.1 }}
-                    whileHover={{ scale: 1.05 }}
-                    className="bg-white text-black px-6 py-6 rounded-lg shadow-md relative"
-                  >
-                    {product.images.length > 0 && (
-                      <motion.img
-                        src={product.images[0]}
-                        alt={product.name}
-                        width={200}
-                        height={200}
-                        className="w-full h-40 object-contain rounded-md"
-                        whileHover={{ scale: 1.1 }}
-                        transition={{ duration: 0.3 }}
-                      />
-                    )}
-                    <h3 className="mt-2 font-semibold">{product.name}</h3>
-                    <p className="text-gray-600">₦{product.price}</p>
-                    <motion.button
-                      whileHover={{ scale: 1.1, backgroundColor: "#65A30D" }}
-                      whileTap={{ scale: 0.9 }}
-                      transition={{ type: "spring", stiffness: 200 }}
-                      className="absolute top-2 right-2 bg-lime-400 text-black px-5 py-2 text-sm rounded-full flex items-center gap-2"
+                {filteredProducts.length > 0 ? (
+                  filteredProducts.map((product, index) => (
+                    <motion.div
+                      key={product.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.5, delay: index * 0.1 }}
+                      whileHover={{ scale: 1.05 }}
+                      className="bg-white text-black px-6 py-6 rounded-lg shadow-md relative"
                     >
-                      <ShoppingCart size={16} />
-                      SHOP NOW
-                    </motion.button>
-                  </motion.div>
-                ))}
+                      {product.images.length > 0 && (
+                        <motion.img
+                          src={product.images[0]}
+                          alt={product.name}
+                          width={200}
+                          height={200}
+                          className="w-full h-40 object-contain rounded-md"
+                          whileHover={{ scale: 1.1 }}
+                          transition={{ duration: 0.3 }}
+                        />
+                      )}
+                      <h3 className="mt-2 font-semibold">{product.name}</h3>
+                      <p className="text-gray-600">₦{product.price}</p>
+                      <motion.button
+                        whileHover={{ scale: 1.1, backgroundColor: "#65A30D" }}
+                        whileTap={{ scale: 0.9 }}
+                        transition={{ type: "spring", stiffness: 200 }}
+                        className="absolute top-2 right-2 bg-lime-400 text-black px-5 py-2 text-sm rounded-full flex items-center gap-2"
+                      >
+                        <ShoppingCart size={16} />
+                        SHOP NOW
+                      </motion.button>
+                    </motion.div>
+                  ))
+                ) : (
+                  <div className="col-span-full text-center text-gray-600">
+                    No products available in this category.
+                  </div>
+                )}
               </div>
 
               {/* See More Button */}

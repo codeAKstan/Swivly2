@@ -13,7 +13,7 @@ def product_list(request):
             'description': product.description,
             'category': product.category.name,
             'user': product.user.username,
-            'images': [image.image.url for image in product.images.all()],
+            'images': [request.build_absolute_uri(image.image.url) for image in product.images.all()],
         })
 
     return JsonResponse(product_data, safe=False)
