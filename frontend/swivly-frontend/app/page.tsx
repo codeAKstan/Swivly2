@@ -1,17 +1,48 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Head from "next/head";
 import Header from "./components/Header";
 import { Typewriter } from "react-simple-typewriter";
-// import Image from "next/image";
 import Testimonials from "./components/Testimonials";
-import FAQSection from "./components/Faqs"
-import Footer from "./components/Footer"
+import FAQSection from "./components/Faqs";
+import Footer from "./components/Footer";
 import { Search, ShoppingCart } from "lucide-react";
 import { motion } from "framer-motion";
 
 export default function Home() {
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    // Fetch products from the backend
+    const fetchProducts = async () => {
+      try {
+        const response = await fetch("http://localhost:8000/product/api/products/");
+        if (!response.ok) {
+          throw new Error("Failed to fetch products");
+        }
+        const data = await response.json();
+        setProducts(data);
+      } catch (error) {
+        setError(error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
+
+  if (loading) {
+    return <p>Loading...</p>;
+  }
+
+  if (error) {
+    return <p>Error: {error}</p>;
+  }
+
   return (
     <>
       <Head>
@@ -46,7 +77,6 @@ export default function Home() {
                 Explore Now
               </button>
             </div>
-
           </div>
         </section>
 
@@ -97,39 +127,30 @@ export default function Home() {
                 />
               </div>
 
-
               {/* Product Grid */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {[
-                  { name: "Spring Mattress", price: "₦75,000.00", img: "/images/mattress.png" },
-                  { name: "Table", price: "₦45,700.00", img: "/images/table.png" },
-                  { name: "Gas cooker", price: "₦110,000.00", img: "/images/gas.png" },
-                  { name: "Laptop Internal SSD", price: "₦35,000.00", img: "/images/harddisk.png" },
-                  { name: "Laptop", price: "₦15,432.00", img: "/images/laptop.png" },
-                  { name: "Hair Clipper", price: "₦26,564.00", img: "/images/clipper.png" },
-                  { name: "Office Chair", price: "₦211,600.00", img: "/images/chair.png" },
-                  { name: "Desktop Fan", price: "₦26,000.00", img: "/images/fan.png" },
-                  { name: "Flash Drive", price: "₦2,600.00", img: "/images/flashdrive.png" },
-                ].map((item, index) => (
-                  <div key={index} className="bg-white text-black px-6 py-6 rounded-lg shadow-md relative">
-                  <motion.div 
-  initial={{ opacity: 0, y: 20 }} 
-  animate={{ opacity: 1, y: 0 }} 
-  transition={{ duration: 0.5, delay: index * 0.1 }}
-  whileHover={{ scale: 1.05 }}
-  className="bg-white text-black px-6 py-6 rounded-lg shadow-md relative"
->
-  <motion.img
-    src={item.img}
-    alt={item.name}
-    width={200}
-    height={200}
-    className="w-full h-40 object-contain rounded-md"
-    whileHover={{ scale: 1.1 }}
-    transition={{ duration: 0.3 }}
-  />
-                    <h3 className="mt-2 font-semibold">{item.name}</h3>
-                    <p className="text-gray-600">{item.price}</p>
+                {products.map((product, index) => (
+                  <motion.div
+                    key={product.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: index * 0.1 }}
+                    whileHover={{ scale: 1.05 }}
+                    className="bg-white text-black px-6 py-6 rounded-lg shadow-md relative"
+                  >
+                    {product.images.length > 0 && (
+                      <motion.img
+                        src={product.images[0]}
+                        alt={product.name}
+                        width={200}
+                        height={200}
+                        className="w-full h-40 object-contain rounded-md"
+                        whileHover={{ scale: 1.1 }}
+                        transition={{ duration: 0.3 }}
+                      />
+                    )}
+                    <h3 className="mt-2 font-semibold">{product.name}</h3>
+                    <p className="text-gray-600">₦{product.price}</p>
                     <motion.button
                       whileHover={{ scale: 1.1, backgroundColor: "#65A30D" }}
                       whileTap={{ scale: 0.9 }}
@@ -139,8 +160,7 @@ export default function Home() {
                       <ShoppingCart size={16} />
                       SHOP NOW
                     </motion.button>
-                    </motion.div>
-                  </div>
+                  </motion.div>
                 ))}
               </div>
 
@@ -157,10 +177,6 @@ export default function Home() {
         <Testimonials />
         <FAQSection />
         <Footer />
-
-
-
-
       </main>
     </>
   );
