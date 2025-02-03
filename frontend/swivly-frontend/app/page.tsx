@@ -9,11 +9,13 @@ import FAQSection from "./components/Faqs";
 import Footer from "./components/Footer";
 import { Search, ShoppingCart } from "lucide-react";
 import { motion } from "framer-motion";
+import Link from "next/link";
 
 export default function Home() {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -54,10 +56,13 @@ export default function Home() {
     return <p>Error: {error}</p>;
   }
 
-  // Filter products based on selected category
-  const filteredProducts = selectedCategory
-    ? products.filter((product) => product.category === selectedCategory)
-    : products;
+  // Filter products based on selected category and search query
+  const filteredProducts = products.filter((product) => {
+    const matchesCategory = selectedCategory ? product.category === selectedCategory : true;
+    const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      product.description.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesCategory && matchesSearch;
+  });
 
   return (
     <>
@@ -150,6 +155,8 @@ export default function Home() {
                   type="text"
                   placeholder="Search items and accommodation"
                   className="w-full p-2 pl-10 rounded-full text-black border border-gray-300"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
                 />
               </div>
 
@@ -157,41 +164,43 @@ export default function Home() {
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {filteredProducts.length > 0 ? (
                   filteredProducts.map((product, index) => (
-                    <motion.div
-                      key={product.id}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.5, delay: index * 0.1 }}
-                      whileHover={{ scale: 1.05 }}
-                      className="bg-white text-black px-6 py-6 rounded-lg shadow-md relative"
-                    >
-                      {product.images.length > 0 && (
-                        <motion.img
-                          src={product.images[0]}
-                          alt={product.name}
-                          width={200}
-                          height={200}
-                          className="w-full h-40 object-contain rounded-md"
-                          whileHover={{ scale: 1.1 }}
-                          transition={{ duration: 0.3 }}
-                        />
-                      )}
-                      <h3 className="mt-2 font-semibold">{product.name}</h3>
-                      <p className="text-gray-600">₦{product.price}</p>
-                      <motion.button
-                        whileHover={{ scale: 1.1, backgroundColor: "#65A30D" }}
-                        whileTap={{ scale: 0.9 }}
-                        transition={{ type: "spring", stiffness: 200 }}
-                        className="absolute top-2 right-2 bg-lime-400 text-black px-5 py-2 text-sm rounded-full flex items-center gap-2"
+                    <Link href={`/product/${product.id}`}>
+                      <motion.div
+                        key={product.id}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5, delay: index * 0.1 }}
+                        whileHover={{ scale: 1.05 }}
+                        className="bg-white text-black px-6 py-6 rounded-lg shadow-md relative cursor-pointer"
                       >
-                        <ShoppingCart size={16} />
-                        SHOP NOW
-                      </motion.button>
-                    </motion.div>
+                        {product.images.length > 0 && (
+                          <motion.img
+                            src={product.images[0]}
+                            alt={product.name}
+                            width={200}
+                            height={200}
+                            className="w-full h-40 object-contain rounded-md"
+                            whileHover={{ scale: 1.1 }}
+                            transition={{ duration: 0.3 }}
+                          />
+                        )}
+                        <h3 className="mt-2 font-semibold">{product.name}</h3>
+                        <p className="text-gray-600">₦{product.price}</p>
+                        <motion.button
+                          whileHover={{ scale: 1.1, backgroundColor: "#65A30D" }}
+                          whileTap={{ scale: 0.9 }}
+                          transition={{ type: "spring", stiffness: 200 }}
+                          className="absolute top-2 right-2 bg-lime-400 text-black px-5 py-2 text-sm rounded-full flex items-center gap-2"
+                        >
+                          <ShoppingCart size={16} />
+                          SHOP NOW
+                        </motion.button>
+                      </motion.div>
+                    </Link>
                   ))
                 ) : (
                   <div className="col-span-full text-center text-gray-600">
-                    No products available in this category.
+                    No products found.
                   </div>
                 )}
               </div>
