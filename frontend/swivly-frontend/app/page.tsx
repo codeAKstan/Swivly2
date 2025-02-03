@@ -12,19 +12,29 @@ import { motion } from "framer-motion";
 
 export default function Home() {
   const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    // Fetch products from the backend
-    const fetchProducts = async () => {
+    // Fetch products and categories from the backend
+    const fetchData = async () => {
       try {
-        const response = await fetch("http://localhost:8000/product/api/products/");
-        if (!response.ok) {
+        // Fetch products
+        const productsResponse = await fetch("http://localhost:8000/product/api/products/");
+        if (!productsResponse.ok) {
           throw new Error("Failed to fetch products");
         }
-        const data = await response.json();
-        setProducts(data);
+        const productsData = await productsResponse.json();
+        setProducts(productsData);
+
+        // Fetch categories
+        const categoriesResponse = await fetch("http://localhost:8000/product/api/categories/");
+        if (!categoriesResponse.ok) {
+          throw new Error("Failed to fetch categories");
+        }
+        const categoriesData = await categoriesResponse.json();
+        setCategories(categoriesData);
       } catch (error) {
         setError(error.message);
       } finally {
@@ -32,7 +42,7 @@ export default function Home() {
       }
     };
 
-    fetchProducts();
+    fetchData();
   }, []);
 
   if (loading) {
@@ -94,14 +104,12 @@ export default function Home() {
                     <input type="radio" name="category" defaultChecked className="accent-lime-400" />
                     <span>All</span>
                   </label>
-                  <label className="flex items-center space-x-2">
-                    <input type="radio" name="category" className="accent-lime-400" />
-                    <span>Marketplace</span>
-                  </label>
-                  <label className="flex items-center space-x-2">
-                    <input type="radio" name="category" className="accent-lime-400" />
-                    <span>Accommodation</span>
-                  </label>
+                  {categories.map((category) => (
+                    <label key={category.id} className="flex items-center space-x-2">
+                      <input type="radio" name="category" className="accent-lime-400" />
+                      <span>{category.name}</span>
+                    </label>
+                  ))}
                 </div>
               </div>
 

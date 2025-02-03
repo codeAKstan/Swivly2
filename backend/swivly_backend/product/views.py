@@ -1,5 +1,5 @@
 from django.http import JsonResponse
-from .models import Product, ProductImage
+from .models import Product, ProductImage, Category
 
 def product_list(request):
     products = Product.objects.filter(available=True).select_related('category', 'user').prefetch_related('images')
@@ -17,3 +17,15 @@ def product_list(request):
         })
 
     return JsonResponse(product_data, safe=False)
+
+def category_list(request):
+    categories = Category.objects.all()
+    category_data = [
+        {
+            'id': category.id,
+            'name': category.name,
+            'slug': category.slug,
+        }
+        for category in categories
+    ]
+    return JsonResponse(category_data, safe=False)
