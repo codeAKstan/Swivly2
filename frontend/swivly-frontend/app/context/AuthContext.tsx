@@ -1,9 +1,9 @@
-// context/AuthContext.tsx
 import { createContext, useContext, useState, useEffect } from "react";
 
 interface AuthContextType {
   isAuthenticated: boolean;
   user: any;
+  loading: boolean; // Add loading state
   login: (token: string, userData: any) => void;
   logout: () => void;
 }
@@ -13,14 +13,17 @@ const AuthContext = createContext<AuthContextType | null>(null);
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true); // Initialize loading as true
 
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
-      console.log("Token found in localStorage, fetching user data...");
-      fetchUserData(token);
+      console.log("Token found in localStorage, setting isAuthenticated to true...");
+      setIsAuthenticated(true); // Immediately set isAuthenticated to true
+      fetchUserData(token); // Fetch user data asynchronously
     } else {
       console.log("No token found in localStorage, user is not authenticated.");
+      setLoading(false); // Set loading to false if no token is found
     }
   }, []);
 
@@ -37,11 +40,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       }
 
       const data = await response.json();
-      setIsAuthenticated(true);
-      setUser(data);
+      setUser(data); // Update user data
+      console.log("User data fetched successfully.");
     } catch (error) {
       console.error("Error fetching user data:", error);
-      logout();
+      logout(); // Log out if the token is invalid
+    } finally {
+      setLoading(false); // Set loading to false after fetching user data
     }
   };
 
@@ -52,7 +57,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     setUser(userData);
     console.log("User logged in successfully. isAuthenticated:", true);
   };
-  
 
   const logout = () => {
     console.log("Logging out user...");
@@ -63,7 +67,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, user, login, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated, user, loading, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

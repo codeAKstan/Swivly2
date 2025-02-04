@@ -6,27 +6,32 @@ import Footer from "../components/Footer";
 import { useCartStore } from "../store/cartStore";
 import { useAuth } from "../context/AuthContext";
 import { useRouter } from "next/navigation";
-import { Home, Phone, CreditCard, ShoppingCart } from "lucide-react";
+import { Home, Phone, CreditCard, ShoppingCart, Mail, User } from "lucide-react";
 import Link from "next/link";
 
 export default function CheckoutPage() {
   const { items } = useCartStore();
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated, user, loading } = useAuth();
   const router = useRouter();
   const [address, setAddress] = useState(user?.address || "");
   const [phoneNumber, setPhoneNumber] = useState(user?.phoneNumber || "");
   const [isEditing, setIsEditing] = useState(false);
 
   // Debugging: Log the authentication state
-  console.log("CheckoutPage - isAuthenticated:", isAuthenticated);
+  console.log("CheckoutPage - isAuthenticated:", isAuthenticated, "Loading:", loading);
 
   // Redirect to login if not authenticated
   useEffect(() => {
-    if (!isAuthenticated) {
+    if (!loading && !isAuthenticated) {
       console.log("User is not authenticated, redirecting to login...");
       router.push("/login");
     }
-  }, [isAuthenticated, router]);
+  }, [isAuthenticated, loading, router]);
+
+  // If still loading, show a loading message
+  if (loading) {
+    return <p>Loading...</p>;
+  }
 
   // If user is not authenticated, do not render the rest of the component
   if (!isAuthenticated) {
@@ -75,6 +80,25 @@ export default function CheckoutPage() {
           <div className="mb-8">
             <h2 className="text-xl font-semibold mb-4">Buyer Details</h2>
             <div className="space-y-4">
+              {/* Email (Read-only) */}
+              <div className="flex items-center gap-2">
+                <Mail size={16} />
+                <p>
+                  <span className="font-medium">Email:</span>{" "}
+                  <span>{user.email}</span>
+                </p>
+              </div>
+
+              {/* Username (Read-only) */}
+              <div className="flex items-center gap-2">
+                <User size={16} />
+                <p>
+                  <span className="font-medium">Username:</span>{" "}
+                  <span>{user.name}</span>
+                </p>
+              </div>
+
+              {/* Address (Editable) */}
               <div className="flex items-center gap-2">
                 <Home size={16} />
                 <p>
@@ -82,15 +106,17 @@ export default function CheckoutPage() {
                   {isEditing ? (
                     <input
                       type="text"
-                      value={address}
+                      value={user.address}
                       onChange={(e) => setAddress(e.target.value)}
                       className="border border-gray-300 p-1 rounded-md"
                     />
                   ) : (
-                    address || "Not provided"
+                    user.address || "Not provided"
                   )}
                 </p>
               </div>
+
+              {/* Phone Number (Editable) */}
               <div className="flex items-center gap-2">
                 <Phone size={16} />
                 <p>
@@ -103,10 +129,12 @@ export default function CheckoutPage() {
                       className="border border-gray-300 p-1 rounded-md"
                     />
                   ) : (
-                    phoneNumber || "Not provided"
+                    user.phone_number || "Not provided"
                   )}
                 </p>
               </div>
+
+              {/* Edit/Save Button */}
               {isEditing ? (
                 <button
                   onClick={handleSave}
