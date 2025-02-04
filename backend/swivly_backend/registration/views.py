@@ -12,6 +12,10 @@ from .models import Profile
 from django.conf import settings
 from rest_framework.authentication import TokenAuthentication
 from rest_framework_simplejwt.authentication import JWTAuthentication 
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse
+
 
 # Use get_user_model() to reference the custom user model
 User = get_user_model()
@@ -115,3 +119,18 @@ class UpdateProfileView(APIView):
             "phoneNumber": user.phone_number or "Null",
             "profilePicture": profile_picture_url or "/images/default-profile.png",
         }, status=status.HTTP_200_OK)
+    
+
+User = get_user_model()
+
+@csrf_exempt
+@login_required
+def update_user_details(request):
+    if request.method == "PUT":
+        user = request.user
+        data = json.loads(request.body)
+        user.address = data.get("address", user.address)
+        user.phone_number = data.get("phoneNumber", user.phone_number)
+        user.save()
+        return JsonResponse({"message": "Details updated successfully"})
+    return JsonResponse({"error": "Invalid request method"}, status=400)

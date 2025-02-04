@@ -186,15 +186,17 @@ export default function Home() {
                         )}
                         <h3 className="mt-2 font-semibold">{product.name}</h3>
                         <p className="text-gray-600">₦{product.price}</p>
-                        <motion.button
-                          whileHover={{ scale: 1.1, backgroundColor: "#65A30D" }}
-                          whileTap={{ scale: 0.9 }}
-                          transition={{ type: "spring", stiffness: 200 }}
-                          className="absolute top-2 right-2 bg-lime-400 text-black px-5 py-2 text-sm rounded-full flex items-center gap-2"
-                        >
-                          <ShoppingCart size={16} />
-                          SHOP NOW
-                        </motion.button>
+                        <Link href={`/product/${product.id}`}>
+                          <motion.button
+                            whileHover={{ scale: 1.1, backgroundColor: "#65A30D" }}
+                            whileTap={{ scale: 0.9 }}
+                            transition={{ type: "spring", stiffness: 200 }}
+                            className="absolute top-2 right-2 bg-lime-400 text-black px-5 py-2 text-sm rounded-full flex items-center gap-2"
+                          >
+                            <ShoppingCart size={16} />
+                            SHOP NOW
+                          </motion.button>
+                        </Link>
                       </motion.div>
                     </Link>
                   ))
