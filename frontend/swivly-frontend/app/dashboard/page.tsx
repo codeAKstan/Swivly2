@@ -102,24 +102,40 @@ const DashboardPage = () => {
         {user.role === "seller" && (
           <div className="mb-8">
             <h2 className="text-xl font-semibold mb-4">Seller Actions</h2>
-            <Link
-              href="/add-product"
-              className="bg-lime-400 text-black px-6 py-2 rounded-full hover:bg-lime-500 transition-colors"
-            >
-              Add Product
-            </Link>
+            <div className="flex space-x-4">
+              <Link
+                href="/add-product"
+                className="bg-lime-400 text-black px-6 py-2 rounded-full hover:bg-lime-500 transition-colors"
+              >
+                Add Product
+              </Link>
+              <Link
+                href="/view-products"
+                className="bg-lime-400 text-black px-6 py-2 rounded-full hover:bg-lime-500 transition-colors"
+              >
+                View Added Products
+              </Link>
+            </div>
           </div>
         )}
 
         {user.role === "agent" && (
           <div className="mb-8">
             <h2 className="text-xl font-semibold mb-4">Agent Actions</h2>
-            <Link
-              href="/list-accommodation"
-              className="bg-lime-400 text-black px-6 py-2 rounded-full hover:bg-lime-500 transition-colors"
-            >
-              List Accommodation
-            </Link>
+            <div className="flex space-x-4">
+              <Link
+                href="/list-accommodation"
+                className="bg-lime-400 text-black px-6 py-2 rounded-full hover:bg-lime-500 transition-colors"
+              >
+                List Accommodation
+              </Link>
+              <Link
+                href="/view-accommodation"
+                className="bg-lime-400 text-black px-6 py-2 rounded-full hover:bg-lime-500 transition-colors"
+              >
+                View Listed Accommodation
+              </Link>
+            </div>
           </div>
         )}
 
