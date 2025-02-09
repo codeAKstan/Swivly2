@@ -37,9 +37,23 @@ const LoginPage = () => {
       console.log("Login successful:", response);
   
       // Save the access token to localStorage
-      localStorage.setItem("token", response.access); 
-
-      authLogin(response.access);
+      localStorage.setItem("token", response.access);
+  
+      // Fetch user data after successful login
+      const userResponse = await fetch("http://localhost:8000/api/user/", {
+        headers: {
+          Authorization: `Bearer ${response.access}`,
+        },
+      });
+  
+      if (!userResponse.ok) {
+        throw new Error("Failed to fetch user data");
+      }
+  
+      const userData = await userResponse.json();
+  
+      // Pass both token and user data to AuthContext
+      authLogin(response.access, userData);
   
       // Redirect to the dashboard
       router.push("/dashboard");

@@ -54,7 +54,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     console.log("Logging in user...");
     localStorage.setItem("token", token);
     setIsAuthenticated(true);
-    setUser(userData);
+    setUser(userData); // Set the user data
     console.log("User logged in successfully. isAuthenticated:", true);
   };
 

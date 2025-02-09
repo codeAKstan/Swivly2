@@ -18,14 +18,22 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from django.middleware.csrf import get_token
+from django.http import JsonResponse
+
+def get_csrf_token(request):
+    token = get_token(request)
+    return JsonResponse({"csrfToken": token})
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('registration.urls')),
     path('product/', include('product.urls')),
+    path("csrf/", get_csrf_token, name="get_csrf_token"),
 ]
 
 
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
