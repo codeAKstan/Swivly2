@@ -5,9 +5,14 @@ import { useRouter } from "next/navigation";
 import Header from "../components/Header";
 import { useAuth } from "../context/AuthContext";
 
+interface Category {
+  id: number;
+  name: string;
+}
+
 const AddProductPage = () => {
   const router = useRouter();
-  const { user, loading: authLoading } = useAuth(); // Get user and loading state from AuthContext
+  const { user, loading: authLoading } = useAuth();
   const [name, setName] = useState("");
   const [price, setPrice] = useState("");
   const [description, setDescription] = useState("");
@@ -15,11 +20,30 @@ const AddProductPage = () => {
   const [images, setImages] = useState<File[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [categories, setCategories] = useState<Category[]>([]); // State to store categories
+
+  // Fetch categories from the backend
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await fetch("http://localhost:8000/product/api/categories/");
+        if (!response.ok) {
+          throw new Error("Failed to fetch categories");
+        }
+        const data = await response.json();
+        setCategories(data);
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+      }
+    };
+
+    fetchCategories();
+  }, []);
 
   // Route guard: Redirect if user is not logged in or not a seller
   useEffect(() => {
     if (!authLoading && (!user || user.role !== "seller")) {
-      router.push("/login"); // Redirect to login page
+      router.push("/login");
     }
   }, [user, authLoading, router]);
 
@@ -34,7 +58,7 @@ const AddProductPage = () => {
     e.preventDefault();
     setLoading(true);
     setError("");
-  
+
     const formData = new FormData();
     formData.append("name", name);
     formData.append("price", price);
@@ -42,18 +66,18 @@ const AddProductPage = () => {
     formData.append("category", category);
     formData.append("user", user.id);
     images.forEach((image) => formData.append("images", image));
-  
+
     try {
       const token = localStorage.getItem("token");
-  
+
       // Fetch the CSRF token from Django
       const csrfResponse = await fetch("http://localhost:8000/csrf/", {
         credentials: "include", // Include cookies
       });
       const csrfData = await csrfResponse.json();
       const csrfToken = csrfData.csrfToken;
-  
-      const response = await fetch("http://localhost:8000/product/api/products/", {
+
+      const response = await fetch("http://localhost:8000/product/api/products/create/", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -62,17 +86,18 @@ const AddProductPage = () => {
         credentials: "include", // Include cookies
         body: formData,
       });
-  
+
       if (!response.ok) {
-        throw new Error("Failed to add product");
+        const errorData = await response.json(); // Parse error response
+        throw new Error(errorData.error || "Failed to add product");
       }
-  
+
       const data = await response.json();
       console.log("Product added successfully:", data);
       router.push("/view-products");
     } catch (error) {
       console.error("Error adding product:", error);
-      setError("Failed to add product. Please try again.");
+      setError(error.message || "Failed to add product. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -132,10 +157,11 @@ const AddProductPage = () => {
               required
             >
               <option value="">Select a category</option>
-              <option value="electronics">Electronics</option>
-              <option value="furniture">Furniture</option>
-              <option value="books">Books</option>
-              <option value="clothing">Clothing</option>
+              {categories.map((cat) => (
+                <option key={cat.id} value={cat.id}>
+                  {cat.name}
+                </option>
+              ))}
             </select>
           </div>
           <div>

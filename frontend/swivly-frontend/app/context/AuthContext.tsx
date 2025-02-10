@@ -34,14 +34,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           Authorization: `Bearer ${token}`,
         },
       });
-
+  
       if (!response.ok) {
         throw new Error("Failed to fetch user data");
       }
-
+  
       const data = await response.json();
       setUser(data); // Update user data
-      console.log("User data fetched successfully.");
+      console.log("User data fetched successfully:", data);
     } catch (error) {
       console.error("Error fetching user data:", error);
       logout(); // Log out if the token is invalid

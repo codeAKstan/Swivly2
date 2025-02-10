@@ -121,7 +121,6 @@ class UpdateProfileView(APIView):
         }, status=status.HTTP_200_OK)
     
 
-User = get_user_model()
 
 @csrf_exempt
 @login_required
@@ -134,3 +133,21 @@ def update_user_details(request):
         user.save()
         return JsonResponse({"message": "Details updated successfully"})
     return JsonResponse({"error": "Invalid request method"}, status=400)
+
+def get_user(request):
+    if request.method == "GET":
+        try:
+            user = request.user
+            if not user.is_authenticated:
+                return JsonResponse({"error": "Not authenticated"}, status=401)
+
+            user_data = {
+                "id": user.id,
+                "name": user.name,
+                "email": user.email,
+                "role": user.role,
+            }
+            return JsonResponse(user_data)
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=400)
+    return JsonResponse({"error": "Invalid request method"}, status=405)

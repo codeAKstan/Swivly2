@@ -1,8 +1,8 @@
-from asyncio.log import logger
 from django.http import JsonResponse
 from .models import Product, ProductImage, Category
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import get_object_or_404
+import logging
 
 
 def product_list(request):
@@ -49,14 +49,19 @@ def product_detail(request, id):
 
 
 
-
+logger = logging.getLogger(__name__)
 
 @csrf_exempt
 def create_product(request):
     if request.method == "POST":
         try:
+            logger.info("Received POST request to create product")
+            logger.info(f"Request headers: {request.headers}")
+            logger.info(f"Request POST data: {request.POST}")
+            logger.info(f"Request FILES: {request.FILES}")
+
             data = request.POST
-            images = request.FILES.getlist("images")  # Ensure this is correct
+            images = request.FILES.getlist("images")
 
             # Debugging: Log the number of images received
             logger.info(f"Number of images received: {len(images)}")
