@@ -56,23 +56,38 @@ def create_product(request):
     if request.method == "POST":
         try:
             logger.info("Received POST request to create product")
-            logger.info(f"Request headers: {request.headers}")
             logger.info(f"Request POST data: {request.POST}")
             logger.info(f"Request FILES: {request.FILES}")
 
             data = request.POST
             images = request.FILES.getlist("images")
 
-            # Debugging: Log the number of images received
-            logger.info(f"Number of images received: {len(images)}")
+            # Validate required fields
+            required_fields = ["name", "price", "description", "category", "user"]
+            for field in required_fields:
+                if field not in data:
+                    return JsonResponse({"error": f"Missing required field: {field}"}, status=400)
+
+            # Validate category
+            try:
+                category_id = int(data["category"])
+                category = Category.objects.get(id=category_id)
+            except (ValueError, Category.DoesNotExist):
+                return JsonResponse({"error": "Invalid category"}, status=400)
+
+            # Validate user
+            try:
+                user_id = int(data["user"])
+            except ValueError:
+                return JsonResponse({"error": "Invalid user"}, status=400)
 
             # Create the product
             product = Product.objects.create(
                 name=data["name"],
                 price=data["price"],
                 description=data["description"],
-                category_id=data["category"],
-                user_id=data["user"],
+                category=category,
+                user_id=user_id,
                 status="pending",  # Default status is pending
             )
 

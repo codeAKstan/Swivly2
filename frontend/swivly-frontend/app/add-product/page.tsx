@@ -58,25 +58,32 @@ const AddProductPage = () => {
     e.preventDefault();
     setLoading(true);
     setError("");
-
+  
+    // Ensure category is selected
+    if (!category) {
+      setError("Please select a category.");
+      setLoading(false);
+      return;
+    }
+  
     const formData = new FormData();
     formData.append("name", name);
     formData.append("price", price);
     formData.append("description", description);
-    formData.append("category", category);
+    formData.append("category", category); // Ensure this is a valid category ID
     formData.append("user", user.id);
     images.forEach((image) => formData.append("images", image));
-
+  
     try {
       const token = localStorage.getItem("token");
-
+  
       // Fetch the CSRF token from Django
       const csrfResponse = await fetch("http://localhost:8000/csrf/", {
         credentials: "include", // Include cookies
       });
       const csrfData = await csrfResponse.json();
       const csrfToken = csrfData.csrfToken;
-
+  
       const response = await fetch("http://localhost:8000/product/api/products/create/", {
         method: "POST",
         headers: {
@@ -86,12 +93,12 @@ const AddProductPage = () => {
         credentials: "include", // Include cookies
         body: formData,
       });
-
+  
       if (!response.ok) {
         const errorData = await response.json(); // Parse error response
         throw new Error(errorData.error || "Failed to add product");
       }
-
+  
       const data = await response.json();
       console.log("Product added successfully:", data);
       router.push("/view-products");
