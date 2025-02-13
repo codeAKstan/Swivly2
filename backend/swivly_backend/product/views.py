@@ -49,6 +49,10 @@ def product_detail(request, id):
 
 
 
+
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 logger = logging.getLogger(__name__)
 
 @csrf_exempt
@@ -78,7 +82,8 @@ def create_product(request):
             # Validate user
             try:
                 user_id = int(data["user"])
-            except ValueError:
+                user = User.objects.get(id=user_id)
+            except (ValueError, User.DoesNotExist):
                 return JsonResponse({"error": "Invalid user"}, status=400)
 
             # Create the product
@@ -87,7 +92,7 @@ def create_product(request):
                 price=data["price"],
                 description=data["description"],
                 category=category,
-                user_id=user_id,
+                user=user,
                 status="pending",  # Default status is pending
             )
 

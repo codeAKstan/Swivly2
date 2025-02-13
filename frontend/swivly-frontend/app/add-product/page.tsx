@@ -66,12 +66,19 @@ const AddProductPage = () => {
       return;
     }
   
+    // Ensure user is logged in and has a valid ID
+    if (!user || !user.id) {
+      setError("User not authenticated. Please log in.");
+      setLoading(false);
+      return;
+    }
+  
     const formData = new FormData();
     formData.append("name", name);
     formData.append("price", price);
     formData.append("description", description);
     formData.append("category", category); // Ensure this is a valid category ID
-    formData.append("user", user.id);
+    formData.append("user", user.id.toString()); // Ensure user ID is a string
     images.forEach((image) => formData.append("images", image));
   
     try {
