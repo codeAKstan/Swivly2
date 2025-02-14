@@ -42,6 +42,7 @@ const AddProductPage = () => {
 
   // Route guard: Redirect if user is not logged in or not a seller
   useEffect(() => {
+    console.log("User object:", user); // Log the user object
     if (!authLoading && (!user || user.role !== "seller")) {
       router.push("/login");
     }
