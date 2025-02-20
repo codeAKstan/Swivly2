@@ -21,7 +21,7 @@ export default function Accommodation() {
       capacity: 3,
       rating: 4.5,
       price: 50000,
-      images: ["/images/apartment1.jpg"],
+      images: ["/images/apartment1.png"],
     },
     {
       id: 2,
@@ -32,7 +32,7 @@ export default function Accommodation() {
       capacity: 2,
       rating: 4.2,
       price: 40000,
-      images: ["/images/studio.jpg"],
+      images: ["/images/apartment2.png"],
     },
   ];
 
@@ -63,19 +63,19 @@ export default function Accommodation() {
         {/* Feature Section */}
         <section className="container mx-auto px-4 py-12 grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
           <div>
-            <img src="/images/search-icon.png" alt="Search" className="mx-auto" />
+            <img src="/images/SearchDesktop.svg" alt="Search" className="mx-auto" />
             <h3 className="font-bold text-xl mt-4">Search simply</h3>
-            <p className="text-gray-600">Search through 5 million hotels in just a few seconds.</p>
+            <p className="text-gray-600">Search through different accommodations in just a few seconds.</p>
           </div>
           <div>
-            <img src="/images/compare-icon.png" alt="Compare" className="mx-auto" />
+            <img src="/images/CompareDesktop.svg" alt="Compare" className="mx-auto" />
             <h3 className="font-bold text-xl mt-4">Compare confidently</h3>
-            <p className="text-gray-600">Compare hotel prices from 100s of sites at once.</p>
+            <p className="text-gray-600">Compare prices from 100s of sites at once.</p>
           </div>
           <div>
-            <img src="/images/save-icon.png" alt="Save" className="mx-auto" />
+            <img src="/images/SaveDesktop.svg" alt="Save" className="mx-auto" />
             <h3 className="font-bold text-xl mt-4">Save big</h3>
-            <p className="text-gray-600">Discover a great deal to book on our partner sites.</p>
+            <p className="text-gray-600">Discover a great deal.</p>
           </div>
         </section>
 
@@ -83,7 +83,7 @@ export default function Accommodation() {
           <div className="container mx-auto px-4 flex flex-col md:flex-row gap-6">
             {/* Sidebar */}
             <aside className="w-full md:w-1/4 bg-[#4D37C3] p-6 rounded-lg text-left">
-              <h2 className="text-lg font-bold text-black bg-lime-400 p-2 rounded-md">FILTER BY</h2>
+              <h2 className="text-lg font-bold text-black bg-lime-400 p-2 rounded-md">FILTER BY LOCATION AND PRICE</h2>
             </aside>
 
             {/* Main Content */}
