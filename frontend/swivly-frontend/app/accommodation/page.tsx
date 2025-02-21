@@ -9,38 +9,53 @@ import Link from "next/link";
 import Footer from "../components/Footer";
 
 export default function Accommodation() {
+  const [accommodations, setAccommodations] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
+  const [locationFilter, setLocationFilter] = useState("");
+  const [minPrice, setMinPrice] = useState("");
+  const [maxPrice, setMaxPrice] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const accommodations = [
-    {
-      id: 1,
-      name: "Cozy Apartment",
-      location: "Lagos, Nigeria",
-      bedrooms: 2,
-      bathrooms: 1,
-      capacity: 3,
-      rating: 4.5,
-      price: 50000,
-      images: ["/images/apartment1.png"],
-    },
-    {
-      id: 2,
-      name: "Modern Studio",
-      location: "Abuja, Nigeria",
-      bedrooms: 1,
-      bathrooms: 1,
-      capacity: 2,
-      rating: 4.2,
-      price: 40000,
-      images: ["/images/apartment2.png"],
-    },
-  ];
+  useEffect(() => {
+    // Fetch accommodations from the backend
+    const fetchData = async () => {
+      try {
+        const response = await fetch("http://localhost:8000/accommodation/api/accommodations/");
+        if (!response.ok) {
+          throw new Error("Failed to fetch accommodations");
+        }
+        const data = await response.json();
+        setAccommodations(data);
+      } catch (error) {
+        setError(error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
 
+    fetchData();
+  }, []);
+
+  if (loading) {
+    return <p>Loading...</p>;
+  }
+
+  if (error) {
+    return <p>Error: {error}</p>;
+  }
+
+  // Filter accommodations based on search query, location, and price
   const filteredAccommodations = accommodations.filter((accommodation) => {
-    return (
-      accommodation.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      accommodation.location.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    const matchesSearch = accommodation.lodge_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      accommodation.location__name.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesLocation = locationFilter
+      ? accommodation.location__name.toLowerCase().includes(locationFilter.toLowerCase())
+      : true;
+    const matchesPrice =
+      (!minPrice || accommodation.price >= parseFloat(minPrice)) &&
+      (!maxPrice || accommodation.price <= parseFloat(maxPrice));
+    return matchesSearch && matchesLocation && matchesPrice;
   });
 
   return (
@@ -83,7 +98,34 @@ export default function Accommodation() {
           <div className="container mx-auto px-4 flex flex-col md:flex-row gap-6">
             {/* Sidebar */}
             <aside className="w-full md:w-1/4 bg-[#4D37C3] p-6 rounded-lg text-left">
-              <h2 className="text-lg font-bold text-black bg-lime-400 p-2 rounded-md">FILTER BY LOCATION AND PRICE</h2>
+              <h2 className="text-lg font-bold text-black bg-lime-400 p-2 rounded-md">FILTER BY</h2>
+              <div className="mt-4">
+                <h3 className="font-semibold text-lg">Location</h3>
+                <input
+                  type="text"
+                  placeholder="Enter location"
+                  className="w-full p-2 rounded-md text-black"
+                  value={locationFilter}
+                  onChange={(e) => setLocationFilter(e.target.value)}
+                />
+              </div>
+              <div className="mt-4">
+                <h3 className="font-semibold text-lg">Price Range</h3>
+                <input
+                  type="number"
+                  placeholder="Min price"
+                  className="w-full p-2 rounded-md text-black"
+                  value={minPrice}
+                  onChange={(e) => setMinPrice(e.target.value)}
+                />
+                <input
+                  type="number"
+                  placeholder="Max price"
+                  className="w-full p-2 rounded-md text-black mt-2"
+                  value={maxPrice}
+                  onChange={(e) => setMaxPrice(e.target.value)}
+                />
+              </div>
             </aside>
 
             {/* Main Content */}
@@ -113,14 +155,19 @@ export default function Accommodation() {
                         className="bg-white text-black px-6 py-6 rounded-lg shadow-md relative cursor-pointer"
                       >
                         <motion.img
-                          src={accommodation.images[0]}
-                          alt={accommodation.name}
+                          src={accommodation.image}
+                          alt={accommodation.lodge_name}
                           className="w-full h-40 object-cover rounded-md"
                           whileHover={{ scale: 1.1 }}
                           transition={{ duration: 0.3 }}
                         />
-                        <h3 className="mt-2 font-semibold">{accommodation.name}</h3>
-                        <p className="text-gray-600">{accommodation.location}</p>
+                        <h3 className="mt-2 font-semibold">{accommodation.lodge_name}</h3>
+                        <p className="text-gray-600">{accommodation.location__name}</p>
+                        <div className="flex items-center mt-2">
+                          <Bed size={16} className="mr-2" />
+                          <span>{accommodation.number_of_rooms} Bedrooms</span>
+                        </div>
+                        <p className="mt-2 font-bold">₦{accommodation.price} / month</p>
                       </motion.div>
                     </Link>
                   ))
