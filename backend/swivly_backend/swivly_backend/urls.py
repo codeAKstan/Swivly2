@@ -32,6 +32,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('registration.urls')),
     path('product/', include('product.urls')),
+    path('accommodation/', include('accommodation.urls')),
     path("csrf/", get_csrf_token, name="get_csrf_token"),
 ]
 

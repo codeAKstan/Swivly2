@@ -167,7 +167,7 @@ export default function Accommodation() {
                           <Bed size={16} className="mr-2" />
                           <span>{accommodation.number_of_rooms} Bedrooms</span>
                         </div>
-                        <p className="mt-2 font-bold">₦{accommodation.price} / month</p>
+                        <p className="mt-2 font-bold">₦{accommodation.price} / year</p>
                       </motion.div>
                     </Link>
                   ))
