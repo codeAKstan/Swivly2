@@ -155,7 +155,7 @@ export default function Accommodation() {
                         className="bg-white text-black px-6 py-6 rounded-lg shadow-md relative cursor-pointer"
                       >
                         <motion.img
-                          src={accommodation.image}
+                          src={`http://localhost:8000/media/${accommodation.image}`}
                           alt={accommodation.lodge_name}
                           className="w-full h-40 object-cover rounded-md"
                           whileHover={{ scale: 1.1 }}
@@ -167,7 +167,7 @@ export default function Accommodation() {
                           <Bed size={16} className="mr-2" />
                           <span>{accommodation.number_of_rooms} Bedrooms</span>
                         </div>
-                        <p className="mt-2 font-bold">₦{accommodation.price} / year</p>
+                        <p className="mt-2 font-bold">₦{accommodation.price} / month</p>
                       </motion.div>
                     </Link>
                   ))
