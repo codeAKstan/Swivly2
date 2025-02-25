@@ -5,7 +5,7 @@ import Head from "next/head";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 import { useParams } from "next/navigation";
-import { Bed, Bath, Users, Star, MapPin } from "lucide-react";
+import { Bed, Bath, Users, Star, MapPin, User, Phone } from "lucide-react";
 
 export default function HouseDetail() {
   const params = useParams();
@@ -13,6 +13,7 @@ export default function HouseDetail() {
   const [house, setHouse] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [showPhoneNumber, setShowPhoneNumber] = useState(false);
 
   useEffect(() => {
     if (id) {
@@ -76,29 +77,38 @@ export default function HouseDetail() {
               <span>{house.location__name}</span>
             </div>
 
+            {/* Listed By */}
+            <div className="flex items-center mt-4">
+              <User size={20} className="mr-2" />
+              <span>Listed by: {house.user__username}</span>
+            </div>
+
             {/* Rooms and Price */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
               <div className="flex items-center">
                 <Bed size={20} className="mr-2" />
                 <span>{house.number_of_rooms} Bedrooms</span>
               </div>
-              <div className="flex items-center">
-                <Bath size={20} className="mr-2" />
-                <span>1 Bathroom</span>
-              </div>
-              <div className="flex items-center">
-                <Star size={20} className="mr-2" />
-                <span>4.5 / 5</span>
-              </div>
             </div>
 
             {/* Price */}
-            <p className="text-2xl font-bold mt-6">₦{house.price} / month</p>
+            <p className="text-2xl font-bold mt-6">₦{house.price} / year</p>
 
             {/* Contact Button */}
-            <button className="bg-lime-400 text-black font-semibold py-3 px-6 rounded-lg mt-6">
+            <button
+              className="bg-lime-400 text-black font-semibold py-3 px-6 rounded-lg mt-6"
+              onClick={() => setShowPhoneNumber(!showPhoneNumber)}
+            >
               Contact Agent
             </button>
+
+            {/* Display Phone Number */}
+            {showPhoneNumber && (
+              <div className="flex items-center mt-4">
+                <Phone size={20} className="mr-2" />
+                <span>Phone: {house.user__phone_number}</span>
+              </div>
+            )}
           </div>
         </div>
       </main>
