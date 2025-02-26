@@ -7,6 +7,8 @@ import { Search, MapPin, Bed, Bath, Users, Star } from "lucide-react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import Footer from "../components/Footer";
+import { useAuth } from "../context/AuthContext"; // Import the useAuth hook
+import { useRouter } from "next/navigation"; // Import the useRouter hook
 
 export default function Accommodation() {
   const [accommodations, setAccommodations] = useState([]);
@@ -16,6 +18,9 @@ export default function Accommodation() {
   const [maxPrice, setMaxPrice] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const { isAuthenticated, user } = useAuth(); // Get authentication status and user data
+  const router = useRouter(); // Initialize the router
 
   useEffect(() => {
     // Fetch accommodations from the backend
@@ -36,6 +41,21 @@ export default function Accommodation() {
 
     fetchData();
   }, []);
+
+  const handleListAccommodation = () => {
+    if (isAuthenticated) {
+      if (user?.role === "agent") {
+        // Redirect to the form for listing accommodations
+        router.push("/accommodation/list");
+      } else {
+        // Display an error message if the user is not an agent
+        alert("You are not authorized to list accommodations. Only agents can perform this action.");
+      }
+    } else {
+      // Redirect to the login page if the user is not authenticated
+      router.push("/login");
+    }
+  };
 
   if (loading) {
     return <p>Loading...</p>;
@@ -91,6 +111,20 @@ export default function Accommodation() {
             <img src="/images/SaveDesktop.svg" alt="Save" className="mx-auto" />
             <h3 className="font-bold text-xl mt-4">Save big</h3>
             <p className="text-gray-600">Discover a great deal.</p>
+          </div>
+        </section>
+
+        {/* Are you an agent? Section */}
+        <section className="bg-white py-12">
+          <div className="container mx-auto px-4 text-center">
+            <h2 className="text-3xl font-bold">Are you an agent?</h2>
+            <p className="mt-4 text-gray-600">List your accommodations and reach thousands of students.</p>
+            <button
+              onClick={handleListAccommodation}
+              className="bg-lime-400 text-black font-semibold py-3 px-6 rounded-lg mt-6"
+            >
+              List Accommodations
+            </button>
           </div>
         </section>
 
@@ -167,7 +201,7 @@ export default function Accommodation() {
                           <Bed size={16} className="mr-2" />
                           <span>{accommodation.number_of_rooms} Bedrooms</span>
                         </div>
-                        <p className="mt-2 font-bold">₦{accommodation.price} / month</p>
+                        <p className="mt-2 font-bold">₦{accommodation.price} / year</p>
                       </motion.div>
                     </Link>
                   ))

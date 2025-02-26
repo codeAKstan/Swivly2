@@ -124,7 +124,7 @@ const DashboardPage = () => {
             <h2 className="text-xl font-semibold mb-4">Agent Actions</h2>
             <div className="flex space-x-4">
               <Link
-                href="/list-accommodation"
+                href="/accommodation/list"
                 className="bg-lime-400 text-black px-6 py-2 rounded-full hover:bg-lime-500 transition-colors"
               >
                 List Accommodation
