@@ -1,16 +1,33 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Head from "next/head";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 import { useAuth } from "../../context/AuthContext";
 import { useRouter } from "next/navigation";
 
+// Function to get the CSRF token from cookies
+function getCookie(name: string): string | null {
+  let cookieValue = null;
+  if (document.cookie && document.cookie !== "") {
+    const cookies = document.cookie.split(";");
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i].trim();
+      if (cookie.substring(0, name.length + 1) === name + "=") {
+        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        break;
+      }
+    }
+  }
+  return cookieValue;
+}
+
 export default function ListAccommodation() {
   const { isAuthenticated, user } = useAuth();
   const router = useRouter();
 
+  const [locations, setLocations] = useState([]);
   const [formData, setFormData] = useState({
     lodge_name: "",
     description: "",
@@ -20,10 +37,60 @@ export default function ListAccommodation() {
     image: null,
   });
 
-  const handleSubmit = async (e) => {
+  // Fetch locations from the backend
+  useEffect(() => {
+    const fetchLocations = async () => {
+      try {
+        const response = await fetch("http://localhost:8000/accommodation/api/locations/");
+        if (!response.ok) {
+          throw new Error("Failed to fetch locations");
+        }
+        const data = await response.json();
+        setLocations(data);
+      } catch (error) {
+        console.error("Error fetching locations:", error);
+      }
+    };
+
+    fetchLocations();
+  }, []);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Submit the form data to the backend
-    // Redirect to the accommodation list page after successful submission
+
+    // Get the CSRF token
+    const csrfToken = getCookie("csrftoken");
+
+    // Create FormData object
+    const formDataToSend = new FormData();
+    formDataToSend.append("lodge_name", formData.lodge_name);
+    formDataToSend.append("description", formData.description);
+    formDataToSend.append("price", formData.price);
+    formDataToSend.append("number_of_rooms", formData.number_of_rooms);
+    formDataToSend.append("location", formData.location);
+    if (formData.image) {
+      formDataToSend.append("image", formData.image);
+    }
+
+    try {
+      const response = await fetch("http://localhost:8000/accommodation/api/accommodations/", {
+        method: "POST",
+        headers: {
+          "X-CSRFToken": csrfToken || "", // Include the CSRF token in the headers
+        },
+        body: formDataToSend, // Use FormData for file uploads
+        credentials: "include", // Include credentials (cookies)
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to submit accommodation");
+      }
+
+      // Redirect to the accommodation list page after successful submission
+      router.push("/accommodation");
+    } catch (error) {
+      console.error("Error submitting accommodation:", error);
+    }
   };
 
   if (!isAuthenticated || user?.role !== "agent") {
@@ -86,13 +153,19 @@ export default function ListAccommodation() {
               </div>
               <div className="mb-4">
                 <label className="block text-gray-700">Location</label>
-                <input
-                  type="text"
+                <select
                   value={formData.location}
                   onChange={(e) => setFormData({ ...formData, location: e.target.value })}
                   className="w-full p-2 border border-gray-300 rounded-md"
                   required
-                />
+                >
+                  <option value="">Select a location</option>
+                  {locations.map((location) => (
+                    <option key={location.id} value={location.id}>
+                      {location.name}
+                    </option>
+                  ))}
+                </select>
               </div>
               <div className="mb-4">
                 <label className="block text-gray-700">Image</label>
