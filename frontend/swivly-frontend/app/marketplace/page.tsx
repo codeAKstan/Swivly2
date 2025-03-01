@@ -71,6 +71,27 @@ export default function Marketplace() {
       </Head>
       <Header />
       <main className="bg-gray-100 min-h-screen">
+        {/* Banner Section */}
+        <section className="relative h-96 w-full">
+          <div className="absolute inset-0 bg-black bg-opacity-50"></div>
+          <img
+            src="/images/marketplace-banner.jpg"
+            alt="Marketplace Banner"
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 flex flex-col items-center justify-center text-white text-center">
+            <h1 className="text-4xl font-bold mb-4">Welcome to the Marketplace</h1>
+            <p className="text-lg">Find the best deals on campus accommodations, products, and more.</p>
+            <Link
+              href="/marketplace"
+              className="mt-6 bg-lime-400 text-black font-semibold py-3 px-6 rounded-lg hover:bg-lime-500 transition-colors"
+            >
+              Explore Now
+            </Link>
+          </div>
+        </section>
+
+        {/* Marketplace Content */}
         <section className="bg-[#6850F5] text-white py-12">
           <div className="container mx-auto px-4 flex flex-col md:flex-row gap-6">
             {/* Sidebar */}
