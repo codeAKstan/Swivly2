@@ -5,6 +5,7 @@ from django.shortcuts import get_object_or_404
 import logging
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
+
 def product_list(request):
     page = request.GET.get('page', 1) 
     per_page = request.GET.get('per_page', 3)
@@ -34,7 +35,7 @@ def product_list(request):
             'images': [request.build_absolute_uri(image.image.url) for image in product.images.all()],
         })
 
- 
+    # Return the paginated response
     return JsonResponse({
         'products': product_data,
         'pagination': {

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react"; // Import useState and useEffect
+import React, { useState, useEffect } from "react";
 import Head from "next/head";
 import Header from "../components/Header";
 import { Search, ShoppingCart } from "lucide-react";
@@ -9,12 +9,12 @@ import Link from "next/link";
 import Footer from "../components/Footer";
 
 export default function Marketplace() {
-  const [products, setProducts] = useState([]); // All products from the API
-  const [categories, setCategories] = useState([]); // All categories from the API
-  const [selectedCategory, setSelectedCategory] = useState(null); // Selected category for filtering
-  const [searchQuery, setSearchQuery] = useState(""); // Search query for filtering
-  const [loading, setLoading] = useState(true); // Loading state
-  const [error, setError] = useState(null); // Error state
+  const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [pagination, setPagination] = useState({
     currentPage: 1,
     totalPages: 1,
@@ -34,8 +34,20 @@ export default function Marketplace() {
         throw new Error("Failed to fetch products");
       }
       const data = await response.json();
+      console.log("API Response:", data); // Log the API response for debugging
+
+      // Set products and pagination
       setProducts(data.products);
-      setPagination(data.pagination);
+
+      // Update pagination state
+      setPagination({
+        currentPage: data.pagination.current_page,
+        totalPages: data.pagination.total_pages,
+        totalProducts: data.pagination.total_products,
+        perPage: data.pagination.per_page,
+        hasNext: data.pagination.has_next,
+        hasPrevious: data.pagination.has_previous,
+      });
     } catch (error) {
       setError(error.message);
     } finally {
