@@ -1,7 +1,6 @@
-// app/marketplace/page.tsx
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react"; // Import useState and useEffect
 import Head from "next/head";
 import Header from "../components/Header";
 import { Search, ShoppingCart } from "lucide-react";
@@ -10,49 +9,62 @@ import Link from "next/link";
 import Footer from "../components/Footer";
 
 export default function Marketplace() {
-  const [products, setProducts] = useState([]);
-  const [categories, setCategories] = useState([]);
-  const [selectedCategory, setSelectedCategory] = useState(null);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [products, setProducts] = useState([]); // All products from the API
+  const [categories, setCategories] = useState([]); // All categories from the API
+  const [selectedCategory, setSelectedCategory] = useState(null); // Selected category for filtering
+  const [searchQuery, setSearchQuery] = useState(""); // Search query for filtering
+  const [loading, setLoading] = useState(true); // Loading state
+  const [error, setError] = useState(null); // Error state
+  const [pagination, setPagination] = useState({
+    currentPage: 1,
+    totalPages: 1,
+    totalProducts: 0,
+    perPage: 3,
+    hasNext: false,
+    hasPrevious: false,
+  });
+
+  // Fetch products and categories from the backend
+  const fetchProducts = async (page = 1, perPage = 3) => {
+    try {
+      const response = await fetch(
+        `http://localhost:8000/product/api/products/?page=${page}&per_page=${perPage}`
+      );
+      if (!response.ok) {
+        throw new Error("Failed to fetch products");
+      }
+      const data = await response.json();
+      setProducts(data.products);
+      setPagination(data.pagination);
+    } catch (error) {
+      setError(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchCategories = async () => {
+    try {
+      const response = await fetch("http://localhost:8000/product/api/categories/");
+      if (!response.ok) {
+        throw new Error("Failed to fetch categories");
+      }
+      const data = await response.json();
+      setCategories(data);
+    } catch (error) {
+      setError(error.message);
+    }
+  };
 
   useEffect(() => {
-    // Fetch products and categories from the backend
-    const fetchData = async () => {
-      try {
-        // Fetch products
-        const productsResponse = await fetch("http://localhost:8000/product/api/products/");
-        if (!productsResponse.ok) {
-          throw new Error("Failed to fetch products");
-        }
-        const productsData = await productsResponse.json();
-        setProducts(productsData);
-
-        // Fetch categories
-        const categoriesResponse = await fetch("http://localhost:8000/product/api/categories/");
-        if (!categoriesResponse.ok) {
-          throw new Error("Failed to fetch categories");
-        }
-        const categoriesData = await categoriesResponse.json();
-        setCategories(categoriesData);
-      } catch (error) {
-        setError(error.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
+    fetchProducts();
+    fetchCategories();
   }, []);
 
-  if (loading) {
-    return <p>Loading...</p>;
-  }
-
-  if (error) {
-    return <p>Error: {error}</p>;
-  }
+  // Handle page change for pagination
+  const handlePageChange = (page) => {
+    fetchProducts(page);
+  };
 
   // Filter products based on selected category and search query
   const filteredProducts = products.filter((product) => {
@@ -61,6 +73,14 @@ export default function Marketplace() {
       product.description.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesCategory && matchesSearch;
   });
+
+  if (loading) {
+    return <p>Loading...</p>;
+  }
+
+  if (error) {
+    return <p>Error: {error}</p>;
+  }
 
   return (
     <>
@@ -197,10 +217,24 @@ export default function Marketplace() {
                 )}
               </div>
 
-              {/* See More Button */}
-              <div className="flex justify-end mt-6">
-                <button className="text-lime-400 text-lg font-bold flex items-center">
-                  See more <span className="ml-2">➡</span>
+              {/* Pagination Controls (Replacing "See More") */}
+              <div className="flex justify-end mt-6 space-x-4">
+                <button
+                  onClick={() => handlePageChange(pagination.currentPage - 1)}
+                  disabled={!pagination.hasPrevious}
+                  className="bg-lime-400 text-black px-4 py-2 rounded-lg disabled:opacity-50"
+                >
+                  Previous
+                </button>
+                <span className="text-black">
+                  Page {pagination.currentPage} of {pagination.totalPages}
+                </span>
+                <button
+                  onClick={() => handlePageChange(pagination.currentPage + 1)}
+                  disabled={!pagination.hasNext}
+                  className="bg-lime-400 text-black px-4 py-2 rounded-lg disabled:opacity-50"
+                >
+                  Next
                 </button>
               </div>
             </div>

@@ -20,7 +20,6 @@ export default function Home() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    // Fetch products and categories from the backend
     const fetchData = async () => {
       try {
         // Fetch products
@@ -29,8 +28,16 @@ export default function Home() {
           throw new Error("Failed to fetch products");
         }
         const productsData = await productsResponse.json();
-        setProducts(productsData);
-
+        console.log("Products API Response:", productsData); // Log the response
+  
+        // Extract the products array from the response
+        if (productsData.products && Array.isArray(productsData.products)) {
+          setProducts(productsData.products);
+        } else {
+          setProducts([]); // Set an empty array if the data is invalid
+          throw new Error("Invalid products data format");
+        }
+  
         // Fetch categories
         const categoriesResponse = await fetch("http://localhost:8000/product/api/categories/");
         if (!categoriesResponse.ok) {
@@ -44,7 +51,7 @@ export default function Home() {
         setLoading(false);
       }
     };
-
+  
     fetchData();
   }, []);
 

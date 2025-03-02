@@ -3,24 +3,49 @@ from .models import Product, ProductImage, Category
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import get_object_or_404
 import logging
-
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 def product_list(request):
-    products = Product.objects.filter(available=True).select_related('category', 'user').prefetch_related('images')
-    product_data = []
+    page = request.GET.get('page', 1) 
+    per_page = request.GET.get('per_page', 3)
 
-    for product in products:
+    products = Product.objects.filter(available=True).select_related('category', 'user').prefetch_related('images')
+
+    paginator = Paginator(products, per_page)
+    try:
+        paginated_products = paginator.page(page)
+    except PageNotAnInteger:
+        # If page is not an integer, deliver the first page
+        paginated_products = paginator.page(1)
+    except EmptyPage:
+        # If page is out of range, deliver the last page
+        paginated_products = paginator.page(paginator.num_pages)
+
+    # Prepare the product data
+    product_data = []
+    for product in paginated_products:
         product_data.append({
             'id': product.id,
             'name': product.name,
-            'price': str(product.price),  # Convert Decimal to string
+            'price': str(product.price),
             'description': product.description,
             'category': product.category.name,
             'user': product.user.username,
             'images': [request.build_absolute_uri(image.image.url) for image in product.images.all()],
         })
 
-    return JsonResponse(product_data, safe=False)
+ 
+    return JsonResponse({
+        'products': product_data,
+        'pagination': {
+            'current_page': paginated_products.number,
+            'total_pages': paginator.num_pages,
+            'total_products': paginator.count,
+            'per_page': int(per_page),
+            'has_next': paginated_products.has_next(),
+            'has_previous': paginated_products.has_previous(),
+        }
+    }, safe=False)
 
 def category_list(request):
     categories = Category.objects.all()
