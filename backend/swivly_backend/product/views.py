@@ -8,7 +8,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 def product_list(request):
     page = request.GET.get('page', 1) 
-    per_page = request.GET.get('per_page', 3)
+    per_page = request.GET.get('per_page', 6)
 
     products = Product.objects.filter(available=True).select_related('category', 'user').prefetch_related('images')
 

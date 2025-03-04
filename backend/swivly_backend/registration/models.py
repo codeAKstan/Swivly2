@@ -15,7 +15,7 @@ class CustomUser(AbstractUser):
 
     # Use email as the username field
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['username']  # Add any other required fields
+    REQUIRED_FIELDS = ['username']
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)

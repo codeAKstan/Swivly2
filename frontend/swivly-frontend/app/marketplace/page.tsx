@@ -19,13 +19,13 @@ export default function Marketplace() {
     currentPage: 1,
     totalPages: 1,
     totalProducts: 0,
-    perPage: 3,
+    perPage: 6,
     hasNext: false,
     hasPrevious: false,
   });
 
   // Fetch products and categories from the backend
-  const fetchProducts = async (page = 1, perPage = 3) => {
+  const fetchProducts = async (page = 1, perPage = 6) => {
     try {
       const response = await fetch(
         `http://localhost:8000/product/api/products/?page=${page}&per_page=${perPage}`

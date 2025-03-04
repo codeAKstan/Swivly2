@@ -18,50 +18,68 @@ export default function Home() {
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [pagination, setPagination] = useState({
+    currentPage: 1,
+    totalPages: 1,
+    totalProducts: 0,
+    perPage: 6,
+    hasNext: false,
+    hasPrevious: false,
+  });
+
+  // Fetch products and categories from the backend
+  const fetchProducts = async (page = 1, perPage = 6) => {
+    try {
+      const response = await fetch(
+        `http://localhost:8000/product/api/products/?page=${page}&per_page=${perPage}`
+      );
+      if (!response.ok) {
+        throw new Error("Failed to fetch products");
+      }
+      const data = await response.json();
+      console.log("Products API Response:", data); // Log the response
+
+      // Set products and pagination
+      setProducts(data.products);
+
+      // Update pagination state
+      setPagination({
+        currentPage: data.pagination.current_page,
+        totalPages: data.pagination.total_pages,
+        totalProducts: data.pagination.total_products,
+        perPage: data.pagination.per_page,
+        hasNext: data.pagination.has_next,
+        hasPrevious: data.pagination.has_previous,
+      });
+    } catch (error) {
+      setError(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchCategories = async () => {
+    try {
+      const response = await fetch("http://localhost:8000/product/api/categories/");
+      if (!response.ok) {
+        throw new Error("Failed to fetch categories");
+      }
+      const data = await response.json();
+      setCategories(data);
+    } catch (error) {
+      setError(error.message);
+    }
+  };
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        // Fetch products
-        const productsResponse = await fetch("http://localhost:8000/product/api/products/");
-        if (!productsResponse.ok) {
-          throw new Error("Failed to fetch products");
-        }
-        const productsData = await productsResponse.json();
-        console.log("Products API Response:", productsData); // Log the response
-  
-        // Extract the products array from the response
-        if (productsData.products && Array.isArray(productsData.products)) {
-          setProducts(productsData.products);
-        } else {
-          setProducts([]); // Set an empty array if the data is invalid
-          throw new Error("Invalid products data format");
-        }
-  
-        // Fetch categories
-        const categoriesResponse = await fetch("http://localhost:8000/product/api/categories/");
-        if (!categoriesResponse.ok) {
-          throw new Error("Failed to fetch categories");
-        }
-        const categoriesData = await categoriesResponse.json();
-        setCategories(categoriesData);
-      } catch (error) {
-        setError(error.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-  
-    fetchData();
+    fetchProducts();
+    fetchCategories();
   }, []);
 
-  if (loading) {
-    return <p>Loading...</p>;
-  }
-
-  if (error) {
-    return <p>Error: {error}</p>;
-  }
+  // Handle page change for pagination
+  const handlePageChange = (page) => {
+    fetchProducts(page);
+  };
 
   // Filter products based on selected category and search query
   const filteredProducts = products.filter((product) => {
@@ -70,6 +88,14 @@ export default function Home() {
       product.description.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesCategory && matchesSearch;
   });
+
+  if (loading) {
+    return <p>Loading...</p>;
+  }
+
+  if (error) {
+    return <p>Error: {error}</p>;
+  }
 
   return (
     <>
@@ -171,9 +197,8 @@ export default function Home() {
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {filteredProducts.length > 0 ? (
                   filteredProducts.map((product, index) => (
-                    <Link href={`/product/${product.id}`}>
+                    <Link href={`/product/${product.id}`} key={product.id}>
                       <motion.div
-                        key={product.id}
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.5, delay: index * 0.1 }}
@@ -214,10 +239,24 @@ export default function Home() {
                 )}
               </div>
 
-              {/* See More Button */}
-              <div className="flex justify-end mt-6">
-                <button className="text-lime-400 text-lg font-bold flex items-center">
-                  See more <span className="ml-2">➡</span>
+              {/* Pagination Controls */}
+              <div className="flex justify-end mt-6 space-x-4">
+                <button
+                  onClick={() => handlePageChange(pagination.currentPage - 1)}
+                  disabled={!pagination.hasPrevious}
+                  className="bg-lime-400 text-black px-4 py-2 rounded-lg disabled:opacity-50"
+                >
+                  Previous
+                </button>
+                <span className="text-black">
+                  Page {pagination.currentPage} of {pagination.totalPages}
+                </span>
+                <button
+                  onClick={() => handlePageChange(pagination.currentPage + 1)}
+                  disabled={!pagination.hasNext}
+                  className="bg-lime-400 text-black px-4 py-2 rounded-lg disabled:opacity-50"
+                >
+                  Next
                 </button>
               </div>
             </div>
