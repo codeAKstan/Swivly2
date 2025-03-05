@@ -4,6 +4,8 @@ import React, { useState } from "react";
 import { FaPhoneAlt, FaMapMarkerAlt } from "react-icons/fa";
 
 import Header from "../components/Header";
+import Footer from "../components/Footer";
+
 
 const ContactPage = () => {
   const [formData, setFormData] = useState({
@@ -104,7 +106,9 @@ const ContactPage = () => {
         </div>
       </div>
     </div>
+    <Footer />
     </div>
+
   );
 };
 
